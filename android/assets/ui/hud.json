@@ -23,66 +23,15 @@
     "huge": {
       "font": "font_32",
       "fontColor": "white"
-    },
-    "info_frame": {
-      "font": "font_16",
-      "fontColor": "white",
-      "up": "frame_brown"
-    },
-    "info": {
-      "font": "font_16",
-      "fontColor": "white"
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
-    "gamePadUp": {
-      "up": "upReleased",
-      "down": "upPress",
-      "checked": "upPress"
-    },
-    "gamePadLeft": {
-      "up": "leftReleased",
-      "down": "leftPress",
-      "checked": "leftPress"
-    },
-    "gamePadRight": {
-      "up": "rightReleased",
-      "down": "rightPress",
-      "checked": "rightPress"
-    },
-    "gamePadDown": {
-      "up": "downReleased",
-      "down": "downPress",
-      "checked": "downPress"
-    },
-    "back": {
-      "up": "backReleased",
-      "down": "backPress",
-      "checked": "backPress"
-    },
-    "select": {
-      "up": "selectReleased",
-      "down": "selectPress",
-      "checked": "selectPress"
-    }
-  },
+
   "com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle": {
     "default": {
-      "background": "knobAfter",
-      "knob": "knob",
-      "knobBefore": "knobBefore"
-    }
-  },
-  "com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle": {
-    "default": {
-      "background": "knobAfter",
-      "knob": "knob",
-      "knobBefore": "knobBefore"
-    },
-    "deactivated": {
-      "background": "knobAfter",
-      "knob": "knobDeactivated",
-      "knobBefore": "knobBeforeDeactivated"
+      "background": "load1",
+      "knob": "load4",
+      "knobBefore": "load3"
     }
   }
+
 }
