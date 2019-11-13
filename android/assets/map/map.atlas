@@ -1,0 +1,146 @@
+
+map.png
+size: 1024,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+blue_32x32
+  rotate: false
+  xy: 1, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+felle
+  rotate: false
+  xy: 35, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+gomb1
+  rotate: false
+  xy: 69, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+gomb2
+  rotate: false
+  xy: 103, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+iv1
+  rotate: false
+  xy: 137, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+iv2
+  rotate: false
+  xy: 171, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+iv3
+  rotate: false
+  xy: 205, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+iv4
+  rotate: false
+  xy: 239, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+kereszt
+  rotate: false
+  xy: 273, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+madar_sprite_32
+  rotate: false
+  xy: 307, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+madar_sprite_32
+  rotate: false
+  xy: 341, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+madar_sprite_32
+  rotate: false
+  xy: 375, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+madar_sprite_32
+  rotate: false
+  xy: 409, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+madar_sprite_32
+  rotate: false
+  xy: 443, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
+madar_sprite_32
+  rotate: false
+  xy: 477, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 6
+mano_32
+  rotate: false
+  xy: 511, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+mano_32
+  rotate: false
+  xy: 545, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+mano_32
+  rotate: false
+  xy: 579, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+mezo
+  rotate: false
+  xy: 613, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+oldal
+  rotate: false
+  xy: 647, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
