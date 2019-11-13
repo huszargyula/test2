@@ -110,7 +110,7 @@ public class GameScreen extends AbstractScreen
     @Override
     protected Table getScreenUI(Skin skin) {
         // return null;
-        return new GameUI(stage, skin);
+        return new GameUI(skin);
     }
 
     private void resetBodieAndFixtureDefinition(){

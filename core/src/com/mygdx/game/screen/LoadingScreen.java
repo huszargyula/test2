@@ -1,6 +1,7 @@
 package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -11,7 +12,7 @@ import com.mygdx.game.UI.LoadingUI;
 
 import static com.mygdx.game.map.MapCol.TAG;
 
-public class LoadingScreen extends AbstractScreen
+public class LoadingScreen extends AbstractScreen<LoadingUI>
 {   //private final gameTD context;
 
     private final AssetManager assetManager;
@@ -27,8 +28,8 @@ public class LoadingScreen extends AbstractScreen
     }
 
     @Override
-    protected Table getScreenUI(final Skin skin) {
-        return new LoadingUI(stage, skin);
+    protected LoadingUI getScreenUI(final Skin skin) {
+        return new LoadingUI(skin);
     }
 
 
@@ -41,11 +42,13 @@ public class LoadingScreen extends AbstractScreen
 
         //assetManager.updet= betülti, igaz ha befejeződött a betöltés
         //assetManager.getprogres, majd a kis loadingbarhoz
-        if (assetManager.update()){
+        // Gdx.input.getX() érdekes beleolvasni!!
+        if (assetManager.update() &&Gdx.input.isKeyPressed(Input.Keys.ENTER)){
 
-    //        context.setScreen(ScreenType.GAME);
+           context.setScreen(ScreenType.GAME);
         }
-
+        //progress bar mozgasa
+        screenUI.setProgress(assetManager.getProgress());
 
         //viewport.apply(true);
     }

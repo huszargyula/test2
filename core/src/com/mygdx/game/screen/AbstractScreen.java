@@ -10,13 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.game.MyTowerDefenseGame;
 
-public  abstract class AbstractScreen implements Screen {
+public  abstract class AbstractScreen <T extends Table> implements Screen {
     protected final MyTowerDefenseGame context;
     protected final FitViewport viewport;
     protected final World world;
     protected final Box2DDebugRenderer box2DDebugRenderer;
-    protected final Table screenUI;
+
     protected final Stage stage;
+    protected final T screenUI;
 
 public AbstractScreen(final MyTowerDefenseGame context){
 
@@ -32,7 +33,7 @@ public AbstractScreen(final MyTowerDefenseGame context){
         }
 
 //table
-protected abstract Table getScreenUI( final Skin skin);
+protected abstract T getScreenUI( final Skin skin);
 
 
 @Override

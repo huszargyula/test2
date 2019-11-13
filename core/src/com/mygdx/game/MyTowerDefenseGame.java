@@ -138,7 +138,7 @@ public class MyTowerDefenseGame extends Game {
 			// az assetmanager furán kezeli- lhetet bugosan, szval ezért rajta kivül dolgozunk
 			//Skin parameter pl utvonal
 
-			final SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("ui/tower_ui.atlas",resources);
+			final SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("ui/hud.atlas",resources);
 
 			assetManager.load("ui/hud.json", Skin.class, skinParameter);
 			//rögötön be is töltjük h a felhasználónak a loading képernyő bejöjjön
