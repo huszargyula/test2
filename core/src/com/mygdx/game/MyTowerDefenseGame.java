@@ -7,10 +7,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -21,6 +25,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -62,6 +67,7 @@ public class MyTowerDefenseGame extends Game {
 
 		private Stage stage;
 		private Skin skin;
+		private I18NBundle i18NBundle;
 
 		public void create(){
 
@@ -111,7 +117,14 @@ public class MyTowerDefenseGame extends Game {
 		}
 
 		private void initalizeSkin(){
+
+			//setup markup colors
+			Colors.put("Red", Color.RED);
+			Colors.put("Blue", Color.BLUE);
+
+
 			//generate ttf bitmaps
+
 			final ObjectMap<String,Object> resources = new ObjectMap<String, Object>();
 
 			final FreeTypeFontGenerator fontGenerator =new FreeTypeFontGenerator(Gdx.files.internal("ui/font.ttf"));
@@ -128,7 +141,11 @@ public class MyTowerDefenseGame extends Game {
 
 			for (int size :sizesToCreate){
 				fontParameter.size = size;
-				resources.put("font_"+size,fontGenerator.generateFont(fontParameter));
+				//kül fontokhoz elmentjük bitmapba
+				final BitmapFont bitmapFont = fontGenerator.generateFont((fontParameter));
+				//"Szinesités" engedélyezése a markup
+				bitmapFont.getData().markupEnabled= true;
+				resources.put("font_"+size,bitmapFont);
 
 
 			}
@@ -141,10 +158,13 @@ public class MyTowerDefenseGame extends Game {
 			final SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("ui/hud.atlas",resources);
 
 			assetManager.load("ui/hud.json", Skin.class, skinParameter);
+			//kül nyelvek betűi: betöltése
+			assetManager.load("ui/strings", I18NBundle.class);
 			//rögötön be is töltjük h a felhasználónak a loading képernyő bejöjjön
 			assetManager.finishLoading();
 			skin = assetManager.get("ui/hud.json", Skin.class);
 
+			i18NBundle = assetManager.get("ui/strings",I18NBundle.class);
 
 
 		}
@@ -259,4 +279,7 @@ public class MyTowerDefenseGame extends Game {
 
 		}
 
+	public I18NBundle getI18NBundle() {
+		return i18NBundle;
 	}
+}

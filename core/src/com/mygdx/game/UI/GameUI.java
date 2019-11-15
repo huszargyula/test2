@@ -4,13 +4,14 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.mygdx.game.MyTowerDefenseGame;
 
 public class GameUI extends Table {
-    public GameUI(final Skin skin) {
+    public GameUI(final MyTowerDefenseGame context) {
 
-        super(skin);
+        super(context.getSkin());
         setFillParent(true);
-        add(new TextButton("Valami",skin,"huge"));
+        add(new TextButton("Valami",getSkin(),"huge"));
 
     }
 }

@@ -107,10 +107,11 @@ public class GameScreen extends AbstractScreen
 
     }
 
+
+
     @Override
-    protected Table getScreenUI(Skin skin) {
-        // return null;
-        return new GameUI(skin);
+    protected GameUI getScreenUI(final MyTowerDefenseGame context) {
+        return new GameUI(context);
     }
 
     private void resetBodieAndFixtureDefinition(){

@@ -1,31 +1,44 @@
 package com.mygdx.game.UI;
 
-import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.StringBuilder;
+import com.mygdx.game.MyTowerDefenseGame;
 
 public class LoadingUI extends Table {
+
+    private final String loadingString;
    private final ProgressBar progressBar;
     private final TextButton txtButton;
     private final TextButton pressAnyKeyButton;
 
 
-    public LoadingUI(final Skin skin) {
-        super(skin);
+    public LoadingUI(final MyTowerDefenseGame context) {
+        super(context.getSkin());
         setFillParent(true); //kitölti a teret
 
-       progressBar=  new ProgressBar(0,1,0.01f ,false, skin ,"default");
+        // kul nyelvekhez
+        final I18NBundle i18NBundle =context.getI18NBundle();
+
+
+       progressBar=  new ProgressBar(0,1,0.01f ,false, getSkin() ,"default");
         //lelassítása hogy szépen lassan menjen - amig nincs sok kép, teszt céljából lássuk
         progressBar.setAnimateDuration(1);
 
-        txtButton =new TextButton("Loading..",skin,"huge");
+        loadingString = i18NBundle.format("loading");
+        txtButton =new TextButton(loadingString, getSkin(),"huge");
+
+        //txtButton =new TextButton("[Red]Lo[Blue]ading..",getSkin(),"huge");
+        //az uj nyelvi beállításokkal:
+        //txtButton =new TextButton(i18NBundle.format("loading"), getSkin(),"huge");
+
+
         txtButton.getLabel().setWrap(true);
 
-        pressAnyKeyButton =new TextButton("Press any key",skin, "normal");
+        pressAnyKeyButton =new TextButton(i18NBundle.format("pressAnyKey"),getSkin(), "small");
         pressAnyKeyButton.getLabel().setWrap(true);
         pressAnyKeyButton.setVisible(false);
 
@@ -42,6 +55,19 @@ public class LoadingUI extends Table {
     public void setProgress(final  float progress){
 
         progressBar.setValue(progress);
+
+        //txtButtob dinamikus updetealése
+        final StringBuilder stringBuilder = txtButton.getLabel().getText();
+        stringBuilder.setLength(0);
+        //...
+        stringBuilder.append(loadingString);
+        stringBuilder.append(" {");
+        stringBuilder.append(progress*100);
+
+
+        stringBuilder.append("% }");
+        //rendszerértesítés h a szövegben változás van, ujra kell renderelni
+        txtButton.getLabel().invalidateHierarchy();
 
         if (progress >=1 && !pressAnyKeyButton.isVisible()){
 

@@ -27,13 +27,13 @@ public AbstractScreen(final MyTowerDefenseGame context){
         this.box2DDebugRenderer =context.getBox2DDebugRenderer();
         stage = context.getStage();
 
-        screenUI = getScreenUI(context.getSkin());
+        screenUI = getScreenUI(context);
 
 
         }
 
 //table
-protected abstract T getScreenUI( final Skin skin);
+protected abstract T getScreenUI( final MyTowerDefenseGame context);
 
 
 @Override

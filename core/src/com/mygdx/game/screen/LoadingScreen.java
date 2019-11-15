@@ -28,8 +28,8 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
     }
 
     @Override
-    protected LoadingUI getScreenUI(final Skin skin) {
-        return new LoadingUI(skin);
+    protected LoadingUI getScreenUI(final MyTowerDefenseGame context) {
+        return new LoadingUI(context);
     }
 
 

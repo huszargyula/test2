@@ -1,28 +1,21 @@
 {
-  "com.badlogic.gdx.graphics.Color": {
-    "white": {
-      "r": 1,
-      "g": 1,
-      "b": 1,
-      "a": 1
-    }
-  },
+
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
     "normal": {
-      "font": "font_20",
-      "fontColor": "white"
+      "font": "font_20"
+
     },
     "big": {
-      "font": "font_26",
-      "fontColor": "white"
+      "font": "font_26"
+
     },
     "small": {
-      "font": "font_16",
-      "fontColor": "white"
+      "font": "font_16"
+
     },
     "huge": {
-      "font": "font_32",
-      "fontColor": "white"
+      "font": "font_32"
+
     }
   },
 
