@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
@@ -30,6 +31,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.game.input.InputManager;
 import com.mygdx.game.screen.AbstractScreen;
 import com.mygdx.game.screen.ScreenType;
 
@@ -69,10 +71,13 @@ public class MyTowerDefenseGame extends Game {
 		private Skin skin;
 		private I18NBundle i18NBundle;
 
+		private InputManager inputManager;
+
 		public void create(){
 
 			spriteBatch = new SpriteBatch();
 			Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
 			//		//fixing delta time
 			accumulator = 0;
 
@@ -97,6 +102,14 @@ public class MyTowerDefenseGame extends Game {
 			//itt a screensize!!
 
 			stage = new Stage(new FitViewport(450,800),spriteBatch); //??
+
+			//input
+			inputManager = new InputManager();
+			//a widgeteket és a keyobordot is tudja kkezelni
+			Gdx.input.setInputProcessor(new InputMultiplexer(inputManager,stage));
+
+
+
 
 			gameCamera = new OrthographicCamera();
 			//screentypeok létrehozása
@@ -169,7 +182,11 @@ public class MyTowerDefenseGame extends Game {
 
 		}
 
-		public FitViewport getScreenViewport(){return screenViewport;}
+	public InputManager getInputManager() {
+		return inputManager;
+	}
+
+	public FitViewport getScreenViewport(){return screenViewport;}
 
 		public Box2DDebugRenderer getBox2DDebugRenderer(){return box2DDebugRenderer;}
 

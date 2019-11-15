@@ -1,16 +1,13 @@
 package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.UI.LoadingUI;
-
-import static com.mygdx.game.map.MapCol.TAG;
+import com.mygdx.game.input.GameKeys;
+import com.mygdx.game.input.InputManager;
 
 public class LoadingScreen extends AbstractScreen<LoadingUI>
 {   //private final gameTD context;
@@ -23,6 +20,9 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
         this. assetManager= context.getAssetManager();
         assetManager.load("map/map.tmx", TiledMap.class);
         //assetManager.finishloading !
+
+        // keybooard input
+      //  context.getInputManager().addInputListener(this);
 
 
     }
@@ -43,10 +43,7 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
         //assetManager.updet= betülti, igaz ha befejeződött a betöltés
         //assetManager.getprogres, majd a kis loadingbarhoz
         // Gdx.input.getX() érdekes beleolvasni!!
-        if (assetManager.update() &&Gdx.input.isKeyPressed(Input.Keys.ENTER)){
-
-           context.setScreen(ScreenType.GAME);
-        }
+        assetManager.update();
         //progress bar mozgasa
         screenUI.setProgress(assetManager.getProgress());
 
@@ -72,6 +69,19 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
 
     @Override
     public void dispose() {
+
+    }
+
+    @Override
+    public void keyPressed(InputManager manager, GameKeys key) {
+
+        if(assetManager.getProgress()>=1) {
+            context.setScreen(ScreenType.GAME);
+        }
+    }
+
+    @Override
+    public void keyUp(InputManager manager, GameKeys key) {
 
     }
 }

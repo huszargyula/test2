@@ -17,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.UI.GameUI;
+import com.mygdx.game.input.GameKeys;
+import com.mygdx.game.input.InputManager;
 import com.mygdx.game.map.CollisionArea;
 import com.mygdx.game.map.MapCol;
 
@@ -25,7 +27,7 @@ import static com.mygdx.game.MyTowerDefenseGame.BIT_GROUND;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_PLAYER;
 import static com.mygdx.game.MyTowerDefenseGame.UNIT_SCALE;
 
-public class GameScreen extends AbstractScreen
+public class GameScreen extends AbstractScreen<GameUI>
 {   //private final gameTD context;
     private final BodyDef bodyDef; // ez a kettő a leeséshez, fizikai enginhez kell
     private final FixtureDef fixtureDef; // fixture jelentése kellék, alkatrész
@@ -37,6 +39,11 @@ public class GameScreen extends AbstractScreen
     //profiler
     private final GLProfiler profiler;
 
+
+    // a karakterhez
+    private boolean directionChange;
+    private int xFactor;
+    private int yFactor;
 
 
 
@@ -160,6 +167,7 @@ public class GameScreen extends AbstractScreen
             //poziicó
             bodyDef.position.set(collisionArea.getX(),collisionArea.getY());
             bodyDef.fixedRotation=true;
+            bodyDef.type= BodyDef.BodyType.StaticBody;
             final Body body= world.createBody(bodyDef);
             body.setUserData("GROUND");
             fixtureDef.filter.categoryBits = BIT_GROUND;
@@ -214,6 +222,13 @@ public class GameScreen extends AbstractScreen
 
         } else {speedY=0;}
 
+        bodyBoard.applyLinearImpulse(
+                (speedX-bodyBoard.getLinearVelocity().x)*player.getMass(), //Xtengely mentén
+                (speedY-bodyBoard.getLinearVelocity().y)*player.getMass(), //Y tengely mentén
+                bodyBoard.getWorldCenter().x-2, //melyik poont hat rá
+                bodyBoard.getWorldCenter().y, //előző pont Y koordonátája
+                true   // ha épp nincs rajta épp erőhatás, felébresztjü
+        );
 
         //erőhatás hozzáadása
        /* player.applyLinearImpulse(
@@ -226,14 +241,15 @@ public class GameScreen extends AbstractScreen
         );*/
 
 
-        bodyBoard.applyLinearImpulse(
-                (speedX-bodyBoard.getLinearVelocity().x)*player.getMass(), //Xtengely mentén
-                (speedY-bodyBoard.getLinearVelocity().y)*player.getMass(), //Y tengely mentén
-                bodyBoard.getWorldCenter().x-2, //melyik poont hat rá
-                bodyBoard.getWorldCenter().y, //előző pont Y koordonátája
-                true   // ha épp nincs rajta épp erőhatás, felébresztjü
-        );
-
+        //PLAYER Mozgatása
+        if (directionChange) {
+            player.applyLinearImpulse(
+                    (xFactor * 3 - player.getLinearVelocity().x * player.getMass()),
+                    (yFactor * 3 - player.getLinearVelocity().y * player.getMass()),
+                    player.getWorldCenter().x, player.getWorldCenter().y,
+                    true
+            );
+        }
 
 
         //   context.setScreen(ScreenType.LOADING); //ez ittmaradt egy demoonstrálésból
@@ -250,13 +266,14 @@ public class GameScreen extends AbstractScreen
         //a második elem: kamera ez lehetne 3d esetén kicsit dönött pl
         box2DDebugRenderer.render(world,viewport.getCamera().combined);
 
-        //profiler bindigs kiratás
-        Gdx.app.debug("RenderInfo", "Bindings"+profiler.getTextureBindings());
-        Gdx.app.debug("RenderInfo", "Drawcalls"+profiler.getDrawCalls());
-        //reeteleni kell mert...log oután, h a belső érteékit reszeteld
-        // 1 Bindig = 1 texture binding
-        profiler.reset();
-
+        if (profiler.isEnabled()) {
+            //profiler bindigs kiratás
+            Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
+            Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
+            //reeteleni kell mert...log oután, h a belső érteékit reszeteld
+            // 1 Bindig = 1 texture binding
+            profiler.reset();
+        }
 
 
     }
@@ -285,5 +302,81 @@ public class GameScreen extends AbstractScreen
         mapRenderer.dispose();
         //itt texture binding
         // GL.profiler!!!!!
+    }
+
+    @Override
+    public void keyPressed(final InputManager manager,final GameKeys key) {
+            switch (key){
+                case LEFT:
+                    directionChange = true;
+                    xFactor =-1;
+                    break;
+
+
+                case RIGHT:
+                    directionChange = true;
+                    xFactor =1;
+                    break;
+
+
+                case UP:
+
+                    directionChange= true;
+                    yFactor =1;
+                    break;
+                case DOWN:
+                    directionChange = true;
+                    yFactor=-1;
+                    break;
+
+
+                default:
+                    return;
+
+
+
+
+            }
+
+
+    }
+
+    @Override
+    public void keyUp(final InputManager manager,final GameKeys key) {
+
+        switch (key){
+            case LEFT:
+                directionChange =true;
+                xFactor = manager.isKeyPressed(GameKeys.RIGHT) ? 1:0;
+
+                break;
+
+            case RIGHT:
+                directionChange =true;
+                xFactor = manager.isKeyPressed(GameKeys.LEFT) ? -1:0;
+
+
+                break;
+
+            case UP:
+                directionChange =true;
+
+                yFactor = manager.isKeyPressed(GameKeys.DOWN) ? -1:0;
+
+                break;
+
+            case DOWN:
+                directionChange =true;
+                yFactor = manager.isKeyPressed(GameKeys.UP) ? 1:0;
+
+                break;
+
+            default:
+                break;
+
+
+        }
+
+
     }
 }

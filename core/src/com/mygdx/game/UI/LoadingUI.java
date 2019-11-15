@@ -1,5 +1,7 @@
 package com.mygdx.game.UI;
 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -7,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.mygdx.game.MyTowerDefenseGame;
+import com.mygdx.game.input.GameKeys;
 
 public class LoadingUI extends Table {
 
@@ -41,6 +44,19 @@ public class LoadingUI extends Table {
         pressAnyKeyButton =new TextButton(i18NBundle.format("pressAnyKey"),getSkin(), "small");
         pressAnyKeyButton.getLabel().setWrap(true);
         pressAnyKeyButton.setVisible(false);
+        //példa overridra
+        pressAnyKeyButton.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+              //gombnyomás szelkció
+                context.getInputManager().notifyKeyDown(GameKeys.SELECT);
+
+
+                return true;
+            }
+        });
+
+
 
         add(pressAnyKeyButton).expand().fillX().bottom().row();
 
