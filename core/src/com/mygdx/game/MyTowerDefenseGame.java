@@ -31,6 +31,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.game.audio.AudioManager;
+import com.mygdx.game.ecs.ECSEngine;
 import com.mygdx.game.input.InputManager;
 import com.mygdx.game.screen.AbstractScreen;
 import com.mygdx.game.screen.ScreenType;
@@ -66,12 +68,18 @@ public class MyTowerDefenseGame extends Game {
 		public static final float UNIT_SCALE = 1/32f; //az egsség
 		private SpriteBatch spriteBatch; //ez a texutárák rendeleléséhez kell
 
+	//audio
+		private AudioManager audioManager;
 
 		private Stage stage;
 		private Skin skin;
 		private I18NBundle i18NBundle;
 
 		private InputManager inputManager;
+
+		//Ecsengine
+
+	private ECSEngine ecsEngine;
 
 		public void create(){
 
@@ -103,12 +111,18 @@ public class MyTowerDefenseGame extends Game {
 
 			stage = new Stage(new FitViewport(450,800),spriteBatch); //??
 
+
+			//audio
+			audioManager = new AudioManager(this);
+
 			//input
 			inputManager = new InputManager();
 			//a widgeteket és a keyobordot is tudja kkezelni
 			Gdx.input.setInputProcessor(new InputMultiplexer(inputManager,stage));
 
 
+			//create Ecsengine
+			ecsEngine = new ECSEngine(this);
 
 
 			gameCamera = new OrthographicCamera();
@@ -181,6 +195,10 @@ public class MyTowerDefenseGame extends Game {
 
 
 		}
+
+	public ECSEngine getEcsEngine() {
+		return ecsEngine;
+	}
 
 	public InputManager getInputManager() {
 		return inputManager;
@@ -258,6 +276,7 @@ public class MyTowerDefenseGame extends Game {
 
 			super.render();
 
+			ecsEngine.update(Gdx.graphics.getRawDeltaTime());
 			//probaképp ill érdekességkép kirjuk az a két frame közötti idő
 			//	Gdx.app.debug(TAG, "idő eltelte két frame között"+Gdx.graphics.getRawDeltaTime());
 
@@ -298,5 +317,9 @@ public class MyTowerDefenseGame extends Game {
 
 	public I18NBundle getI18NBundle() {
 		return i18NBundle;
+	}
+
+	public AudioManager getAudioManager() {
+		return audioManager;
 	}
 }

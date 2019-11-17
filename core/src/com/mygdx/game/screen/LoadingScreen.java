@@ -2,10 +2,13 @@ package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.UI.LoadingUI;
+import com.mygdx.game.audio.AudioType;
 import com.mygdx.game.input.GameKeys;
 import com.mygdx.game.input.InputManager;
 
@@ -13,6 +16,8 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
 {   //private final gameTD context;
 
     private final AssetManager assetManager;
+    private boolean isMusicLoaded;
+
 
     public LoadingScreen(final MyTowerDefenseGame context){
         super(context);
@@ -21,10 +26,11 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
         assetManager.load("map/map.tmx", TiledMap.class);
         //assetManager.finishloading !
 
-        // keybooard input
-      //  context.getInputManager().addInputListener(this);
-
-
+      //load audio
+        isMusicLoaded = false;
+        for (final AudioType audioType:AudioType.values()){
+          assetManager.load(audioType.getFilePath(),audioType.isMusic() ? Music.class: Sound.class);
+        }
     }
 
     @Override
@@ -46,8 +52,14 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
         assetManager.update();
         //progress bar mozgasa
         screenUI.setProgress(assetManager.getProgress());
+        if (!isMusicLoaded && assetManager.isLoaded(AudioType.INTRO.getFilePath())){
+           isMusicLoaded = true;
+           audioManager.playAudio(AudioType.INTRO);
 
-        //viewport.apply(true);
+        }
+
+
+
     }
 
     @Override
@@ -72,11 +84,28 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
 
     }
 
+
+    @Override
+    public void show(){
+
+        super.show();
+
+    }
+
+    @Override
+    public void hide(){
+        super.hide();
+        audioManager.stopCurrentMusic();
+
+
+    }
+
     @Override
     public void keyPressed(InputManager manager, GameKeys key) {
 
+        audioManager.playAudio(AudioType.SELECT);
         if(assetManager.getProgress()>=1) {
-            context.setScreen(ScreenType.GAME);
+           context.setScreen(ScreenType.GAME);
         }
     }
 

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.game.MyTowerDefenseGame;
+import com.mygdx.game.audio.AudioManager;
 import com.mygdx.game.input.GameKeyInputListener;
 import com.mygdx.game.input.InputManager;
 
@@ -20,6 +21,7 @@ public  abstract class AbstractScreen <T extends Table> implements Screen , Game
     protected final Stage stage;
     protected final T screenUI;
     protected  final InputManager inputManager;
+    protected final AudioManager audioManager;
 
 public AbstractScreen(final MyTowerDefenseGame context){
 
@@ -32,6 +34,8 @@ public AbstractScreen(final MyTowerDefenseGame context){
         stage = context.getStage();
         screenUI = getScreenUI(context);
 
+        //audio
+       audioManager= context.getAudioManager();
 
         }
 

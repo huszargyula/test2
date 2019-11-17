@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -110,7 +111,9 @@ public class GameScreen extends AbstractScreen<GameUI>
         mapRenderer.setMap(tiledMap);
         map = new MapCol(tiledMap);
         spawnCollisionAreas();
-        spawnPlayer();
+        //width az one world unit
+        context.getEcsEngine().createPlayer(map.getStartLocation(),1,1);
+
 
     }
 
@@ -127,36 +130,13 @@ public class GameScreen extends AbstractScreen<GameUI>
 
     }
 
-    private void spawnPlayer(){
-        resetBodieAndFixtureDefinition();
-
-// kör létrehozás mostmár player
-
-        //poziicó
-
-        bodyDef.position.set(map.getStartLocation().x,map.getStartLocation().y +0.5f);// 0.5  a magassága
-        bodyDef.fixedRotation = true;
-        bodyDef.type= BodyDef.BodyType.DynamicBody;
-        player= world.createBody(bodyDef);
-        player.setUserData("PLAYER");
-
-        fixtureDef.filter.categoryBits = BIT_PLAYER;
-        fixtureDef.filter.maskBits = BIT_GROUND | BIT_BOARD;
-        //final PolygonShape
-
-        final PolygonShape pShape =  new PolygonShape();
-        pShape.setAsBox(0.5f,0.5f);
-        fixtureDef.shape =pShape;
-        player.createFixture(fixtureDef);
-        pShape.dispose();
-
-
-
-    }
 
 
     private void spawnCollisionAreas(){
         //későbbiekben a mapmangere class használata
+
+        final BodyDef bodyDef = new BodyDef();
+        final FixtureDef fixtureDef = new FixtureDef();
 
         for (final CollisionArea collisionArea : map.getCollisionAreas()){
 
@@ -195,8 +175,6 @@ public class GameScreen extends AbstractScreen<GameUI>
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //force, mozgás
-        final float speedX;
-        final float speedY;
 
         /*
         if(Gdx.input.isKeyPressed(Input.Keys.A)){
@@ -213,7 +191,12 @@ public class GameScreen extends AbstractScreen<GameUI>
             speedY = 3;
         } else {speedY = 0;}
 */
-        speedX =0;
+
+
+        /*
+
+        ezt mind ki lehet szedni csak a péda miatt maradt bent
+
         if(Gdx.input.isTouched()) {
 
             //context.setScreen(ScreenType.LOADING); //ez ittmaradt egy demoonstrálésból
@@ -230,6 +213,8 @@ public class GameScreen extends AbstractScreen<GameUI>
                 true   // ha épp nincs rajta épp erőhatás, felébresztjü
         );
 
+        */
+
         //erőhatás hozzáadása
        /* player.applyLinearImpulse(
                 impluseX //Xtengely mentén
@@ -241,15 +226,7 @@ public class GameScreen extends AbstractScreen<GameUI>
         );*/
 
 
-        //PLAYER Mozgatása
-        if (directionChange) {
-            player.applyLinearImpulse(
-                    (xFactor * 3 - player.getLinearVelocity().x * player.getMass()),
-                    (yFactor * 3 - player.getLinearVelocity().y * player.getMass()),
-                    player.getWorldCenter().x, player.getWorldCenter().y,
-                    true
-            );
-        }
+
 
 
         //   context.setScreen(ScreenType.LOADING); //ez ittmaradt egy demoonstrálésból
@@ -304,79 +281,16 @@ public class GameScreen extends AbstractScreen<GameUI>
         // GL.profiler!!!!!
     }
 
+
     @Override
     public void keyPressed(final InputManager manager,final GameKeys key) {
-            switch (key){
-                case LEFT:
-                    directionChange = true;
-                    xFactor =-1;
-                    break;
-
-
-                case RIGHT:
-                    directionChange = true;
-                    xFactor =1;
-                    break;
-
-
-                case UP:
-
-                    directionChange= true;
-                    yFactor =1;
-                    break;
-                case DOWN:
-                    directionChange = true;
-                    yFactor=-1;
-                    break;
-
-
-                default:
-                    return;
-
-
-
-
-            }
-
 
     }
+
 
     @Override
     public void keyUp(final InputManager manager,final GameKeys key) {
-
-        switch (key){
-            case LEFT:
-                directionChange =true;
-                xFactor = manager.isKeyPressed(GameKeys.RIGHT) ? 1:0;
-
-                break;
-
-            case RIGHT:
-                directionChange =true;
-                xFactor = manager.isKeyPressed(GameKeys.LEFT) ? -1:0;
-
-
-                break;
-
-            case UP:
-                directionChange =true;
-
-                yFactor = manager.isKeyPressed(GameKeys.DOWN) ? -1:0;
-
-                break;
-
-            case DOWN:
-                directionChange =true;
-                yFactor = manager.isKeyPressed(GameKeys.UP) ? 1:0;
-
-                break;
-
-            default:
-                break;
-
-
-        }
-
-
     }
+
+
 }
