@@ -5,12 +5,15 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.UI.LoadingUI;
 import com.mygdx.game.audio.AudioType;
 import com.mygdx.game.input.GameKeys;
 import com.mygdx.game.input.InputManager;
+import com.mygdx.game.map.MapType;
 
 public class LoadingScreen extends AbstractScreen<LoadingUI>
 {   //private final gameTD context;
@@ -23,11 +26,26 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
         super(context);
         //átatódik az assetMAnager és betölti a mapot
         this. assetManager= context.getAssetManager();
-        assetManager.load("map/map.tmx", TiledMap.class);
+
+        //effekt betoltése
+
+        assetManager.load("charracters_effects/effect.atlas", TextureAtlas.class );
+
+
+       //1 darab map betöltése
+       // assetManager.load("map/map.tmx", TiledMap.class);
         //assetManager.finishloading !
 
-      //load audio
-        isMusicLoaded = false;
+        //összes map betötése
+
+        for (final MapType mapType :MapType.values()){
+
+            assetManager.load(mapType.getFilePath(),TiledMap.class);
+        }
+
+
+             //load audio
+             isMusicLoaded = false;
         for (final AudioType audioType:AudioType.values()){
           assetManager.load(audioType.getFilePath(),audioType.isMusic() ? Music.class: Sound.class);
         }

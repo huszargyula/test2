@@ -57,7 +57,7 @@ public class MyTowerDefenseGame extends Game {
 		public static final short BIT_BOARD =1<<4;
 		/// ///////// a fizikai világ látrehozása
 		private World world;
-		private Box2DDebugRenderer box2DDebugRenderer;
+
 		private WorldContactListener worldContactListener;
 		//Collision detect
 		public static final BodyDef BODY_DEF = new BodyDef(); // ez a kettő a leeséshez, fizikai enginhez kell
@@ -112,8 +112,6 @@ public class MyTowerDefenseGame extends Game {
 			//hozzáadjuk a Collosion detectálás miatt ( is ?)
 			worldContactListener = new WorldContactListener();
 			world.setContactListener(worldContactListener);
-
-			box2DDebugRenderer =new Box2DDebugRenderer();
 
 			//assetMannger inicializálása
 			assetManager = new AssetManager();
@@ -235,7 +233,6 @@ public class MyTowerDefenseGame extends Game {
 
 	public FitViewport getScreenViewport(){return screenViewport;}
 
-		public Box2DDebugRenderer getBox2DDebugRenderer(){return box2DDebugRenderer;}
 
 		public AssetManager getAssetManager(){
 
@@ -291,7 +288,7 @@ public class MyTowerDefenseGame extends Game {
 		@Override
 		public void dispose(){
 			super.dispose();
-			box2DDebugRenderer.dispose();
+			gameRenderer.dispose();
 			world.dispose();
 			assetManager.dispose(); // bonyim játéknál menet közben
 			//dispos, ! utnaolvas
