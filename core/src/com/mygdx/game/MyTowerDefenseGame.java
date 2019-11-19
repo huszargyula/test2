@@ -20,8 +20,10 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -31,9 +33,11 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.game.UI.GameRenderer;
 import com.mygdx.game.audio.AudioManager;
 import com.mygdx.game.ecs.ECSEngine;
 import com.mygdx.game.input.InputManager;
+import com.mygdx.game.map.MapManager;
 import com.mygdx.game.screen.AbstractScreen;
 import com.mygdx.game.screen.ScreenType;
 
@@ -56,10 +60,12 @@ public class MyTowerDefenseGame extends Game {
 		private Box2DDebugRenderer box2DDebugRenderer;
 		private WorldContactListener worldContactListener;
 		//Collision detect
+		public static final BodyDef BODY_DEF = new BodyDef(); // ez a kettő a leeséshez, fizikai enginhez kell
+		public static final FixtureDef FIXTURE_DEF = new FixtureDef(); // fixture jelentése kellék, alkatrész
 
 
 
-		//delta time fixing
+	//delta time fixing
 		private static final float FIXED_TIME_STEP = 1/60f; // azaz 60 frame per sec
 		private float accumulator;
 		//ne legyen statikus
@@ -80,6 +86,13 @@ public class MyTowerDefenseGame extends Game {
 		//Ecsengine
 
 	private ECSEngine ecsEngine;
+
+	//map manager
+
+	private MapManager mapManager ;
+
+
+	private GameRenderer gameRenderer;
 
 		public void create(){
 
@@ -121,14 +134,28 @@ public class MyTowerDefenseGame extends Game {
 			Gdx.input.setInputProcessor(new InputMultiplexer(inputManager,stage));
 
 
-			//create Ecsengine
-			ecsEngine = new ECSEngine(this);
-
-
+			//setup game viewport
 			gameCamera = new OrthographicCamera();
 			//screentypeok létrehozása
 			//9:16 a mobilok / képernyők általános képernyő aránya. ennek utánajárni!
 			screenViewport = new FitViewport(18,16, gameCamera);
+
+
+
+			//setup Mapmanger
+			mapManager = new MapManager(this);
+
+
+			//create Ecsengine
+			ecsEngine = new ECSEngine(this);
+
+
+			// create gameRenderer
+
+			gameRenderer = new GameRenderer(this);
+
+
+			//set first screen
 			screenCache = new EnumMap<ScreenType, AbstractScreen>(ScreenType.class);
 			setScreen(ScreenType.LOADING);
 
@@ -196,6 +223,8 @@ public class MyTowerDefenseGame extends Game {
 
 		}
 
+	public MapManager getMapManager(){return mapManager ;}
+
 	public ECSEngine getEcsEngine() {
 		return ecsEngine;
 	}
@@ -244,7 +273,7 @@ public class MyTowerDefenseGame extends Game {
 					screenCache.put(screenType,newScreen);
 					setScreen(newScreen);
 				} catch (ReflectionException e) {
-					throw new GdxRuntimeException("Screen" + screenType + "Could not be created", e);
+					throw new GdxRuntimeException("Screen " + screenType + "Could not be created", e);
 
 				} catch (Exception e){
 
@@ -276,7 +305,9 @@ public class MyTowerDefenseGame extends Game {
 
 			super.render();
 
-			ecsEngine.update(Gdx.graphics.getRawDeltaTime());
+			final float deltaTime = Math.min(0.25f, Gdx.graphics.getRawDeltaTime());
+
+			ecsEngine.update(deltaTime);
 			//probaképp ill érdekességkép kirjuk az a két frame közötti idő
 			//	Gdx.app.debug(TAG, "idő eltelte két frame között"+Gdx.graphics.getRawDeltaTime());
 
@@ -290,7 +321,7 @@ public class MyTowerDefenseGame extends Game {
 
 
 
-			accumulator += Math.min(0.25f,Gdx.graphics.getRawDeltaTime());
+			accumulator += deltaTime;
 
 			while(accumulator>= FIXED_TIME_STEP){
 
@@ -306,14 +337,35 @@ public class MyTowerDefenseGame extends Game {
 			//később ki lehet simitani a rendereinget ez a későbbiekre
 			//interpolációs rendering
 
+
+			gameRenderer.render(accumulator/FIXED_TIME_STEP);
 			//valami történik az uI-val villog, kihajvánol => az act updateli
 			stage.getViewport().apply(); //draw elött v rener elött mindig meg kell hívni
 // Video 16 12:20
-			stage.act();
+			stage.act(deltaTime);
 			stage.draw();
 
 
 		}
+
+	public static void resetBodieAndFixtureDefinition(){
+
+		BODY_DEF.position.set(0,0);
+		BODY_DEF.gravityScale =0;
+		BODY_DEF.type = BodyDef.BodyType.StaticBody;
+		BODY_DEF.fixedRotation = false;
+
+		FIXTURE_DEF.density =0;
+		FIXTURE_DEF.isSensor =false;
+		FIXTURE_DEF.restitution= 0;
+		FIXTURE_DEF.friction=0.2f;
+		FIXTURE_DEF.filter.categoryBits =0x0001;
+		FIXTURE_DEF.filter.maskBits=-1;
+		FIXTURE_DEF.shape=null;
+
+
+	}
+
 
 	public I18NBundle getI18NBundle() {
 		return i18NBundle;

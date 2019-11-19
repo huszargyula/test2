@@ -103,8 +103,9 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
     @Override
     public void keyPressed(InputManager manager, GameKeys key) {
 
-        audioManager.playAudio(AudioType.SELECT);
+
         if(assetManager.getProgress()>=1) {
+            audioManager.playAudio(AudioType.SELECT);
            context.setScreen(ScreenType.GAME);
         }
     }

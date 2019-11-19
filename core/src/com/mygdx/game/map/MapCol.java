@@ -160,4 +160,8 @@ public class MapCol {
     public Array<CollisionArea> getCollisionAreas() {
         return collisionAreas;
     }
+
+    public TiledMap getTiledMap() {
+        return this.tiledMap; // nem tuti
+    }
 }

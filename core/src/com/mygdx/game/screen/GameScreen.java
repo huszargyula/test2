@@ -2,6 +2,7 @@ package com.mygdx.game.screen;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.game.MyTowerDefenseGame;
@@ -22,35 +24,21 @@ import com.mygdx.game.input.GameKeys;
 import com.mygdx.game.input.InputManager;
 import com.mygdx.game.map.CollisionArea;
 import com.mygdx.game.map.MapCol;
+import com.mygdx.game.map.MapListener;
+import com.mygdx.game.map.MapManager;
+import com.mygdx.game.map.MapType;
 
-import static com.mygdx.game.MyTowerDefenseGame.BIT_BOARD;
-import static com.mygdx.game.MyTowerDefenseGame.BIT_GROUND;
-import static com.mygdx.game.MyTowerDefenseGame.BIT_PLAYER;
+
 import static com.mygdx.game.MyTowerDefenseGame.UNIT_SCALE;
 
-public class GameScreen extends AbstractScreen<GameUI>
+public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 {   //private final gameTD context;
-    private final BodyDef bodyDef; // ez a kettő a leeséshez, fizikai enginhez kell
-    private final FixtureDef fixtureDef; // fixture jelentése kellék, alkatrész
-    private static final  String TAG =  MyTowerDefenseGame.class.getSimpleName();
-    private Body player;
-    private final Body bodyBoard;// ? final ????
-    private final AssetManager assetManager;
+   // private final AssetManager assetManager;
+    private final OrthogonalTiledMapRenderer mapRenderer;
     private final OrthographicCamera gameCamera;
     //profiler
     private final GLProfiler profiler;
-
-
-    // a karakterhez
-    private boolean directionChange;
-    private int xFactor;
-    private int yFactor;
-
-
-
-    //MapCol kirajzolásához mi az egy egység itt 32 a tile map miatt
-    private final OrthogonalTiledMapRenderer mapRenderer;
-    private MapCol map;
+    private final MapManager mapManager;
 
     public GameScreen(final MyTowerDefenseGame context){
         //this.context = context;
@@ -58,7 +46,6 @@ public class GameScreen extends AbstractScreen<GameUI>
         super(context);
         //meg kell mondani h mi
         mapRenderer = new OrthogonalTiledMapRenderer(null,UNIT_SCALE, context.getSpriteBatch());
-        assetManager = context.getAssetManager();
         this.gameCamera = context.getGameCamera();
 
         //profiler
@@ -67,10 +54,8 @@ public class GameScreen extends AbstractScreen<GameUI>
 
         //player
         //létrhozzuk a leeső tárgyakat.
-        bodyDef = new BodyDef();
-        fixtureDef = new FixtureDef();
 
-
+        /* TÖRÖLHETŐ, CSAK PÉLDÁNAK MARAD BENT
         //EZ A SAJÁT JÁTÉK DESZKÁJA
         bodyDef.position.set(4.6f,3);
         //gravitációs skála, alaphelyzetből 1 es
@@ -101,18 +86,14 @@ public class GameScreen extends AbstractScreen<GameUI>
         bodyBoard.createFixture(fixtureDef);
         pShape.dispose();
 
+*/
 
 
-
-
-        final TiledMap tiledMap = assetManager.get("map/map.tmx", TiledMap.class);
-
-        //ha  már betöltötttük a térképet az assestmengerbe, kapja meg a maprendere
-        mapRenderer.setMap(tiledMap);
-        map = new MapCol(tiledMap);
-        spawnCollisionAreas();
+        mapManager =context.getMapManager();
+        mapManager.addMapListener(this);
+        mapManager.setMap(MapType.MAP_1);
         //width az one world unit
-        context.getEcsEngine().createPlayer(map.getStartLocation(),1,1);
+        context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartLocation(),1,1);
 
 
     }
@@ -124,45 +105,8 @@ public class GameScreen extends AbstractScreen<GameUI>
         return new GameUI(context);
     }
 
-    private void resetBodieAndFixtureDefinition(){
 
 
-
-    }
-
-
-
-    private void spawnCollisionAreas(){
-        //későbbiekben a mapmangere class használata
-
-        final BodyDef bodyDef = new BodyDef();
-        final FixtureDef fixtureDef = new FixtureDef();
-
-        for (final CollisionArea collisionArea : map.getCollisionAreas()){
-
-            resetBodieAndFixtureDefinition();
-
-            //create room
-
-            //poziicó
-            bodyDef.position.set(collisionArea.getX(),collisionArea.getY());
-            bodyDef.fixedRotation=true;
-            bodyDef.type= BodyDef.BodyType.StaticBody;
-            final Body body= world.createBody(bodyDef);
-            body.setUserData("GROUND");
-            fixtureDef.filter.categoryBits = BIT_GROUND;
-            fixtureDef.filter.maskBits = -1 ;
-            final ChainShape chainShape = new ChainShape();
-            chainShape.createChain(collisionArea.getVertices());
-            //összekötjük a kettőt
-            fixtureDef.shape =chainShape;
-            body.createFixture(fixtureDef);
-            chainShape.dispose();
-
-
-        }
-
-    }
 
 
 
@@ -171,8 +115,6 @@ public class GameScreen extends AbstractScreen<GameUI>
     @Override
     public void render(float delta) {
 
-        Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //force, mozgás
 
@@ -232,25 +174,20 @@ public class GameScreen extends AbstractScreen<GameUI>
         //   context.setScreen(ScreenType.LOADING); //ez ittmaradt egy demoonstrálésból
 
 
-        viewport.apply(true);
+        //true: fix camera
+        //false: mozgathato
 
 
-        mapRenderer.setView(gameCamera);
-        //egyik map renderer lehetőség, ekkor mindent rendel pl ami nem object
-        //a tile layerek a szok sorrendben megjelennek
-        //layerenként is lehetne!
-        mapRenderer.render();
-        //a második elem: kamera ez lehetne 3d esetén kicsit dönött pl
-        box2DDebugRenderer.render(world,viewport.getCamera().combined);
 
-        if (profiler.isEnabled()) {
-            //profiler bindigs kiratás
-            Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
-            Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
-            //reeteleni kell mert...log oután, h a belső érteékit reszeteld
-            // 1 Bindig = 1 texture binding
-            profiler.reset();
+        //TODO remove mapChange TEST stuff
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
+            mapManager.setMap(MapType.MAP_1);
+
+
+        }else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
+            mapManager.setMap(MapType.MAP_2);
         }
+
 
 
     }
@@ -276,9 +213,7 @@ public class GameScreen extends AbstractScreen<GameUI>
 
     @Override
     public void dispose() {
-        mapRenderer.dispose();
-        //itt texture binding
-        // GL.profiler!!!!!
+
     }
 
 
@@ -293,4 +228,8 @@ public class GameScreen extends AbstractScreen<GameUI>
     }
 
 
+    @Override
+    public void mapChanged(MapCol map) {
+
+    }
 }
