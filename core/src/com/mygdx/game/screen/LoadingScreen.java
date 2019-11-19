@@ -61,9 +61,10 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
 
     @Override
     public void render(float delta) {
-
-        Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+//itt már nem rendelődik demmi, hanem a "gameRenderer" ben történik
+        //és ott márkitörli
+   //     Gdx.gl.glClearColor(0,0,0,1);
+    //    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //assetManager.updet= betülti, igaz ha befejeződött a betöltés
         //assetManager.getprogres, majd a kis loadingbarhoz

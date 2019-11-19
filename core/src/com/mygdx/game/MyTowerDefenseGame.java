@@ -55,6 +55,7 @@ public class MyTowerDefenseGame extends Game {
 		public static final short BIT_GROUND =1<<2; // az 1 est 0 pozicióval mozgatjuk balra azaz 0000 0000 0000 0100
 		public static final short BIT_CIRCLE =1<<3;
 		public static final short BIT_BOARD =1<<4;
+		public static final short	BIT_GAME_OBJECT =1<<5;
 		/// ///////// a fizikai világ látrehozása
 		private World world;
 
@@ -138,14 +139,16 @@ public class MyTowerDefenseGame extends Game {
 			//9:16 a mobilok / képernyők általános képernyő aránya. ennek utánajárni!
 			screenViewport = new FitViewport(18,16, gameCamera);
 
-
+			//FONTOS A SORREND!!!!!
+			//create Ecsengine
+			ecsEngine = new ECSEngine(this);
 
 			//setup Mapmanger
 			mapManager = new MapManager(this);
 
 
-			//create Ecsengine
-			ecsEngine = new ECSEngine(this);
+
+
 
 
 			// create gameRenderer
