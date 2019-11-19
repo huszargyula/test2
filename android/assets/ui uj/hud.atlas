@@ -1,0 +1,111 @@
+
+hud.png
+size: 1024,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+knob
+  rotate: false
+  xy: 1, 1
+  size: 14, 30
+  orig: 14, 30
+  offset: 0, 0
+  index: -1
+knob_after
+  rotate: false
+  xy: 67, 1
+  size: 40, 30
+  orig: 40, 30
+  offset: 0, 0
+  index: -1
+knob_before
+  rotate: false
+  xy: 133, 1
+  size: 40, 30
+  orig: 40, 30
+  offset: 0, 0
+  index: -1
+load1
+  rotate: false
+  xy: 199, 1
+  size: 20, 30
+  orig: 20, 30
+  offset: 0, 0
+  index: -1
+load2
+  rotate: false
+  xy: 265, 1
+  size: 20, 30
+  orig: 20, 30
+  offset: 0, 0
+  index: -1
+load3
+  rotate: false
+  xy: 331, 1
+  size: 20, 30
+  orig: 20, 30
+  offset: 0, 0
+  index: -1
+load4
+  rotate: false
+  xy: 397, 1
+  size: 20, 30
+  orig: 20, 30
+  offset: 0, 0
+  index: -1
+ny1
+  rotate: false
+  xy: 463, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ny2
+  rotate: false
+  xy: 529, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ny3
+  rotate: false
+  xy: 595, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ny32bal
+  rotate: false
+  xy: 661, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ny32fel
+  rotate: false
+  xy: 727, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ny32jobb
+  rotate: false
+  xy: 793, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ny32le
+  rotate: false
+  xy: 859, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ny4
+  rotate: false
+  xy: 925, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

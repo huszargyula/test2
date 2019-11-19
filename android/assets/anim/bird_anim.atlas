@@ -1,0 +1,20 @@
+
+bird_anim.png
+size: 512,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bird_an
+  rotate: false
+  xy: 1, 1
+  size: 137, 64
+  orig: 137, 64
+  offset: 0, 0
+  index: -1
+exp2
+  rotate: false
+  xy: 140, 1
+  size: 41, 41
+  orig: 41, 41
+  offset: 0, 0
+  index: -1

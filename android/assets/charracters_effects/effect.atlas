@@ -1,0 +1,20 @@
+
+effect.png
+size: 128,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+exp2
+  rotate: false
+  xy: 1, 1
+  size: 41, 41
+  orig: 41, 41
+  offset: 0, 0
+  index: -1
+nyil
+  rotate: false
+  xy: 44, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
