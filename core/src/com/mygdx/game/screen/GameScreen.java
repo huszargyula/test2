@@ -91,7 +91,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 
         mapManager =context.getMapManager();
         mapManager.addMapListener(this);
-        mapManager.setMap(MapType.MAP_2);
+        mapManager.setMap(MapType.MAP_1);
         //width az one world unit
         context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartLocation(),1,1);
 

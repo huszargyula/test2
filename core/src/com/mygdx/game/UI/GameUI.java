@@ -11,7 +11,7 @@ public class GameUI extends Table {
 
         super(context.getSkin());
         setFillParent(true);
-        add(new TextButton("Valami",getSkin(),"huge"));
+      //  add(new TextButton("Valami",getSkin(),"huge"));
 
     }
 }

@@ -30,6 +30,7 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>
         //effekt betoltése
 
         assetManager.load("charracters_effects/effect.atlas", TextureAtlas.class );
+        assetManager.load("anim/bird_anim.atlas", TextureAtlas.class );
 
 
        //1 darab map betöltése
