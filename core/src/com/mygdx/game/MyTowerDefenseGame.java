@@ -374,4 +374,8 @@ public class MyTowerDefenseGame extends Game {
 	public AudioManager getAudioManager() {
 		return audioManager;
 	}
+
+	public WorldContactListener getWorldContactListener() {
+		return worldContactListener;
+	}
 }

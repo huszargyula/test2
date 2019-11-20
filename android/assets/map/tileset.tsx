@@ -21,4 +21,14 @@
    <frame tileid="17" duration="170"/>
   </animation>
  </tile>
+ <tile id="16">
+  <properties>
+   <property name="type" value="GNOMEOBJECT"/>
+  </properties>
+ </tile>
+ <tile id="17">
+  <properties>
+   <property name="type" value="GNOMEOBJECT"/>
+  </properties>
+ </tile>
 </tileset>

@@ -87,7 +87,7 @@ public class MapCol {
 
             }else{
 
-                Gdx.app.debug(TAG, "There is no gameObject type defined for tile!"+ tiledMapObjProperties.get("id",Integer.class));
+                Gdx.app.debug(TAG, "There is no gameObject type defined for tile! "+ tiledMapObjProperties.get("id",Integer.class));
                 continue;
             }
 
@@ -203,6 +203,8 @@ public class MapCol {
         for (final MapObject mapObj : mapObjects){
 
             if (mapObj instanceof RectangleMapObject){
+                //a kérédés h kell e olyan üres négyzet aminek nincs képe de nem kell a koll areának.
+
                 Gdx.app.debug(TAG, "RECTTANGLE  betoltve?");
                 final RectangleMapObject rectangleMapObject = (RectangleMapObject) mapObj;
                 final Rectangle rectangle = rectangleMapObject.getRectangle();
@@ -236,6 +238,8 @@ public class MapCol {
                 rectVertices[9]=0;
 
                 collisionAreas.add(new CollisionArea(rectangle.x,rectangle.y, rectVertices));
+
+
             }
 
             else if (mapObj instanceof EllipseMapObject){

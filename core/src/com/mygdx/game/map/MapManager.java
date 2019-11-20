@@ -95,7 +95,7 @@ public class MapManager {
     private void destroyGameObjects() {
         //két külön tárolás az array index átugrása miatt
         for (final Entity entity: ecsEngine.getEntities()){
-            if (ECSEngine.gameObjcmpMapper.get(entity)!=null){//26:41
+            if (ECSEngine.gameObjCmpMapper.get(entity)!=null){//26:41
                 gameObjectsToRemove.add(entity);
 
             }

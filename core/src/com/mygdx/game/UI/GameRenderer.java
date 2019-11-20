@@ -151,8 +151,8 @@ public class GameRenderer implements Disposable, MapListener {
         spriteBatch.end();
         if (profiler.isEnabled()) {
             //profiler bindigs kiratás
-            Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
-            Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
+         //   Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
+         //   Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
             //reeteleni kell mert...log oután, h a belső érteékit reszeteld
             // 1 Bindig = 1 texture binding
             profiler.reset();
@@ -168,7 +168,7 @@ public class GameRenderer implements Disposable, MapListener {
 
         final B2DComponent b2DComponent =ECSEngine.b2dCmpMapper.get(entity);
         final  AnimationComponent aniComponent = ECSEngine.aniCmpMapper.get(entity);
-        final  GameObjectComponent gameObjectComponent = ECSEngine.gameObjcmpMapper.get(entity);
+        final  GameObjectComponent gameObjectComponent = ECSEngine.gameObjCmpMapper.get(entity);
 
         if (gameObjectComponent.animationIndex != -1){
 

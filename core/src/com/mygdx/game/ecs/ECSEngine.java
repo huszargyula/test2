@@ -19,6 +19,7 @@ import com.mygdx.game.map.GameObject;
 import com.mygdx.game.system.AnimationSystem;
 import com.mygdx.game.system.PlayerAnimationSystem;
 import com.mygdx.game.system.PlayerCameraSystem;
+import com.mygdx.game.system.PlayerCollisionSystem;
 import com.mygdx.game.system.PlayerMovmentSystem;
 
 import javax.management.relation.RoleList;
@@ -36,7 +37,7 @@ public class ECSEngine extends PooledEngine {
     public static final ComponentMapper<PlayerComponent> playerCmpMapper =ComponentMapper.getFor(PlayerComponent.class);
     public static final ComponentMapper<B2DComponent> b2dCmpMapper= ComponentMapper.getFor(B2DComponent.class);
     public static final ComponentMapper<AnimationComponent> aniCmpMapper = ComponentMapper.getFor(AnimationComponent.class);
-    public static final ComponentMapper<GameObjectComponent> gameObjcmpMapper = ComponentMapper.getFor(GameObjectComponent.class);
+    public static final ComponentMapper<GameObjectComponent> gameObjCmpMapper = ComponentMapper.getFor(GameObjectComponent.class);
 
 
 
@@ -58,6 +59,7 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new PlayerCameraSystem(context));
         this.addSystem(new AnimationSystem(context));
         this.addSystem(new PlayerAnimationSystem(context));
+        this.addSystem(new PlayerCollisionSystem(context));
 
         localPosition = new Vector2();
         posBeforeRotation = new Vector2();
@@ -94,14 +96,14 @@ public class ECSEngine extends PooledEngine {
              MyTowerDefenseGame.BODY_DEF.fixedRotation = true;
              MyTowerDefenseGame.BODY_DEF.type= BodyDef.BodyType.DynamicBody;
             b2DComponent.body= world.createBody(MyTowerDefenseGame.BODY_DEF);
-            b2DComponent.body.setUserData("PLAYER");
+            b2DComponent.body.setUserData(player);
             b2DComponent.width = width;
             b2DComponent.height =height;
             //anim
             b2DComponent.renderPosition.set(b2DComponent.body.getPosition());
 
             MyTowerDefenseGame.FIXTURE_DEF.filter.categoryBits = BIT_PLAYER;
-            MyTowerDefenseGame.FIXTURE_DEF.filter.maskBits = BIT_GROUND | BIT_BOARD;
+            MyTowerDefenseGame.FIXTURE_DEF.filter.maskBits = BIT_GROUND | BIT_GAME_OBJECT;
             //final PolygonShape
 
             final PolygonShape pShape =  new PolygonShape();
@@ -158,7 +160,7 @@ public class ECSEngine extends PooledEngine {
         MyTowerDefenseGame.BODY_DEF.gravityScale =0;
         b2DComponent.body= world.createBody(MyTowerDefenseGame.BODY_DEF);
 
-        b2DComponent.body.setUserData("GAMEOBJECT");
+        b2DComponent.body.setUserData(gameObjectEntity);
         b2DComponent.width = gameObject.getWidth();
         b2DComponent.height =gameObject.getHeight();
         //save position before rotation - Tild is roating around the bottom left corner insted of the center of Tile
