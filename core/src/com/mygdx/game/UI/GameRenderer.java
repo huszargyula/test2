@@ -40,6 +40,8 @@ import com.mygdx.game.map.MapManager;
 import java.util.ArrayList;
 import java.util.EnumMap;
 
+import box2dLight.RayHandler;
+
 import static com.mygdx.game.MyTowerDefenseGame.UNIT_SCALE;
 
 public class GameRenderer implements Disposable, MapListener {
@@ -65,6 +67,8 @@ public class GameRenderer implements Disposable, MapListener {
     private final ObjectMap<String, TextureRegion[][]> regionCache;
     public  IntMap<Animation<Sprite>> mapAnimations;
 
+    //világítás
+    private final RayHandler rayHandler;
 
     //proba Dummy sprite
  //   private Sprite dummySprite;
@@ -103,7 +107,7 @@ public class GameRenderer implements Disposable, MapListener {
 
 
         }
-
+        rayHandler= context.getRayHandler();
 
     }
 
@@ -149,6 +153,11 @@ public class GameRenderer implements Disposable, MapListener {
 
         }
         spriteBatch.end();
+
+        //világitás
+        rayHandler.setCombinedMatrix(gameCamera);
+        rayHandler.updateAndRender();
+
         if (profiler.isEnabled()) {
             //profiler bindigs kiratás
          //   Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());

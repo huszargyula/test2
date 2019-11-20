@@ -12,6 +12,8 @@ import com.mygdx.game.audio.AudioManager;
 import com.mygdx.game.input.GameKeyInputListener;
 import com.mygdx.game.input.InputManager;
 
+import box2dLight.RayHandler;
+
 public  abstract class AbstractScreen <T extends Table> implements Screen , GameKeyInputListener {
     protected final MyTowerDefenseGame context;
     protected final FitViewport viewport;
@@ -22,9 +24,14 @@ public  abstract class AbstractScreen <T extends Table> implements Screen , Game
     protected  final InputManager inputManager;
     protected final AudioManager audioManager;
 
+    protected final RayHandler rayHandler;
+
 public AbstractScreen(final MyTowerDefenseGame context){
 
+
         this.context= context;
+
+        this.rayHandler = context.getRayHandler();
         viewport = context.getScreenViewport();
         this.world = context.getWorld();
 
@@ -45,6 +52,10 @@ protected abstract T getScreenUI( final MyTowerDefenseGame context);
 public void resize(final int width, final int height){
         viewport.update(width,height);
         stage.getViewport().update(width,height,true);
+
+      //a terület ahol a rayhandler should render
+    //kell a resiznál!
+        rayHandler.useCustomViewport(viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 
         }
 

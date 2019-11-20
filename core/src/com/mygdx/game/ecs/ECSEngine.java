@@ -3,6 +3,8 @@ package com.mygdx.game.ecs;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.ai.utils.Ray;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +19,7 @@ import com.mygdx.game.ecs.component.GameObjectComponent;
 import com.mygdx.game.ecs.component.PlayerComponent;
 import com.mygdx.game.map.GameObject;
 import com.mygdx.game.system.AnimationSystem;
+import com.mygdx.game.system.LightSystem;
 import com.mygdx.game.system.PlayerAnimationSystem;
 import com.mygdx.game.system.PlayerCameraSystem;
 import com.mygdx.game.system.PlayerCollisionSystem;
@@ -24,6 +27,8 @@ import com.mygdx.game.system.PlayerMovmentSystem;
 
 import javax.management.relation.RoleList;
 
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import jdk.nashorn.internal.runtime.PropertyAccess;
 
 import static com.mygdx.game.MyTowerDefenseGame.BIT_BOARD;
@@ -42,14 +47,17 @@ public class ECSEngine extends PooledEngine {
 
 
     private final World world;
-    public Vector2 localPosition;
-    public Vector2 posBeforeRotation;
-    public Vector2 posAfterRotation;
+    private final Vector2 localPosition;
+    private final Vector2 posBeforeRotation;
+    private final Vector2 posAfterRotation;
+
+    //világitás
+    private final RayHandler rayHandler;
 
     public ECSEngine(final MyTowerDefenseGame context){
         super(); //alapból 100 entity, 100 compomnents
         world = context.getWorld();
-
+        rayHandler = context.getRayHandler();
 
         //hozzáadjuk az ECS hez
         //lehet removolni is
@@ -60,6 +68,9 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new AnimationSystem(context));
         this.addSystem(new PlayerAnimationSystem(context));
         this.addSystem(new PlayerCollisionSystem(context));
+        //lighting
+        this.addSystem(new LightSystem());
+
 
         localPosition = new Vector2();
         posBeforeRotation = new Vector2();
@@ -111,6 +122,25 @@ public class ECSEngine extends PooledEngine {
              MyTowerDefenseGame.FIXTURE_DEF.shape =pShape;
             b2DComponent.body.createFixture( MyTowerDefenseGame.FIXTURE_DEF);
             pShape.dispose();
+
+
+            //player light
+        //típusok
+        //pointlight pontfény
+        // Directionlight
+        // Cone light
+        //chain Light
+            //mennyi ray, enyhén light
+
+            b2DComponent.lightDistance =6;
+            b2DComponent.lightFluctuacionSpeed=4;
+             b2DComponent.light = new PointLight(rayHandler, 64,new Color(1,1,1,0.7f),b2DComponent.lightDistance,b2DComponent.body.getPosition().x,b2DComponent.body.getPosition().y);
+            b2DComponent.lightFluctuacionDistance =b2DComponent.light.getDistance()*0.16f;
+
+
+        //a fény kövesse ajátékost
+            b2DComponent.light.attachToBody(b2DComponent.body);
+
 
             player.add(b2DComponent);
 

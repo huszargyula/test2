@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.game.MyTowerDefenseGame;
+import com.mygdx.game.PreferenceManager;
 import com.mygdx.game.UI.GameUI;
 import com.mygdx.game.input.GameKeys;
 import com.mygdx.game.input.InputManager;
@@ -40,6 +41,8 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
     private final GLProfiler profiler;
     private final MapManager mapManager;
 
+    private  final PreferenceManager preferenceManager;
+
     public GameScreen(final MyTowerDefenseGame context){
         //this.context = context;
 
@@ -52,6 +55,8 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
         profiler= new GLProfiler(Gdx.graphics);
         profiler.enable();
 
+
+        preferenceManager = context.getPreferenceManager();
         //player
         //létrhozzuk a leeső tárgyakat.
 
@@ -186,11 +191,16 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 
         }else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
             mapManager.setMap(MapType.MAP_2);
-        }
+
+         }else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
+            //preferenceManager.saveGameState();
+            //a creat playert külön elmenti
+}
 
 
 
-    }
+
+}
     /*
        // @Override
         public void resize(int width, int height) {

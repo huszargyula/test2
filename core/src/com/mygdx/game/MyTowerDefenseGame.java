@@ -43,6 +43,9 @@ import com.mygdx.game.screen.ScreenType;
 
 import java.util.EnumMap;
 
+import box2dLight.Light;
+import box2dLight.RayHandler;
+
 public class MyTowerDefenseGame extends Game {
 		private static final  String TAG =  MyTowerDefenseGame.class.getSimpleName();
 
@@ -95,6 +98,13 @@ public class MyTowerDefenseGame extends Game {
 
 	private GameRenderer gameRenderer;
 
+	//világítás
+	private RayHandler rayHandler;
+
+	// mentés
+
+	private PreferenceManager preferenceManager;
+
 		public void create(){
 
 			spriteBatch = new SpriteBatch();
@@ -114,6 +124,16 @@ public class MyTowerDefenseGame extends Game {
 			worldContactListener = new WorldContactListener();
 			world.setContactListener(worldContactListener);
 
+			//világítás
+			rayHandler = new RayHandler(world);
+			//alap fény létrehzoás
+			rayHandler.setAmbientLight(0,0,0,0.2f);
+			// a többi fény a B2d componetnben!!
+
+
+			//lehet szűrni amit nem akarsz megvilágitani testet
+										//a Bit_playeünk fénye , (?? minend group "1" ?, csak a BITGroundot világitsa meg)
+			Light.setGlobalContactFilter(BIT_PLAYER, (short)1,BIT_GROUND);
 			//assetMannger inicializálása
 			assetManager = new AssetManager();
 			// beálít h tudjon tildemapat loadoljon
@@ -155,6 +175,8 @@ public class MyTowerDefenseGame extends Game {
 
 			gameRenderer = new GameRenderer(this);
 
+			//preferenc manager
+			preferenceManager = new PreferenceManager();
 
 			//set first screen
 			screenCache = new EnumMap<ScreenType, AbstractScreen>(ScreenType.class);
@@ -292,11 +314,13 @@ public class MyTowerDefenseGame extends Game {
 		public void dispose(){
 			super.dispose();
 			gameRenderer.dispose();
+			rayHandler.dispose();
 			world.dispose();
 			assetManager.dispose(); // bonyim játéknál menet közben
 			//dispos, ! utnaolvas
 			spriteBatch.dispose();
 			stage.dispose();
+
 		}
 
 
@@ -377,5 +401,13 @@ public class MyTowerDefenseGame extends Game {
 
 	public WorldContactListener getWorldContactListener() {
 		return worldContactListener;
+	}
+
+	public RayHandler getRayHandler() {
+		return rayHandler;
+	}
+
+	public PreferenceManager getPreferenceManager() {
+		return preferenceManager;
 	}
 }
