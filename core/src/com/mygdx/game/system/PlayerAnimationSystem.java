@@ -3,6 +3,7 @@ package com.mygdx.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.UI.AnimationType;
@@ -26,6 +27,8 @@ public class PlayerAnimationSystem extends IteratingSystem {
 
         final B2DComponent b2DComponent = ECSEngine.b2dCmpMapper.get(entity);
         final AnimationComponent animationComponent = ECSEngine.aniCmpMapper.get(entity);
+
+
 
 
         if (b2DComponent.body.getLinearVelocity().equals(Vector2.Zero)){

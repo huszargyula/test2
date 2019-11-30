@@ -37,7 +37,7 @@ public class WorldContactListener implements ContactListener {
        // final Fixture fixtureB = contact.getFixtureB();
 
 
-       // Gdx.app.debug("CONTACT", "BEGIN:"+fixtureA.getBody().getUserData() + "" +fixtureA.isSensor());
+        //Gdx.app.debug("CONTACT", "BEGIN:"+fixtureA.getBody().getUserData() + "" +fixtureA.isSensor());
        // Gdx.app.debug("CONTACT", "BEGIN:"+fixtureB.getBody().getUserData() + "" +fixtureB.isSensor());
 
         //gameObject + player érintkezik
@@ -49,7 +49,6 @@ public class WorldContactListener implements ContactListener {
         // kül kategóriák is vannak /Bit game Object- playerBit ezt kell ellenőrizni
         final int catFixA =  contact.getFixtureA().getFilterData().categoryBits;
         final int catFixB =  contact.getFixtureB().getFilterData().categoryBits;
-
         if ((int)(catFixA & BIT_PLAYER )== BIT_PLAYER){
             player = (Entity) bodyA.getUserData();
 

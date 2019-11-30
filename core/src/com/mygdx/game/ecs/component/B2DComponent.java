@@ -2,6 +2,7 @@ package com.mygdx.game.ecs.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Pool;
 
@@ -18,6 +19,10 @@ public class B2DComponent implements Component, Pool.Poolable {
     public float lightFluctuacionDistance;
     public float lightFluctuacionTime;
     public float lightFluctuacionSpeed;
+    public boolean directionsSetted;
+
+    // hová kattintott a játékos
+    public Vector3 setDirection= new Vector3();
 
 
     //animáciohoz
@@ -25,10 +30,13 @@ public class B2DComponent implements Component, Pool.Poolable {
 
     @Override
     public void reset() {
+
+        setDirection.set(0,0,0);
          lightDistance =0;
          lightFluctuacionDistance =0;
          lightFluctuacionTime=0;
         lightFluctuacionSpeed=0;
+        directionsSetted = false;
 
 
         if (light!=null){

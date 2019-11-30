@@ -8,13 +8,14 @@ public class PlayerComponent implements Component, Pool.Poolable {
 
     public boolean hasAxe;
     public Vector2 speed = new Vector2();
-
+    public boolean hasSelected;
 
 
 
     @Override
     public void reset() {
 
+        hasSelected = false;
         hasAxe = false;
         speed.set(0,0);
 

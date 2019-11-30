@@ -11,15 +11,17 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.input.GameKeys;
 
-public class LoadingUI extends Table {
+public class LoadingGameUI extends Table {
 
     private final String loadingString;
    private final ProgressBar progressBar;
     private final TextButton txtButton;
+
+
     private final TextButton pressAnyKeyButton;
 
 
-    public LoadingUI(final MyTowerDefenseGame context) {
+    public LoadingGameUI(final MyTowerDefenseGame context) {
         super(context.getSkin());
         setFillParent(true); //kitölti a teret
 
@@ -29,9 +31,9 @@ public class LoadingUI extends Table {
 
        progressBar=  new ProgressBar(0,1,0.01f ,false, getSkin() ,"default");
         //lelassítása hogy szépen lassan menjen - amig nincs sok kép, teszt céljából lássuk
-        progressBar.setAnimateDuration(1);
+       // progressBar.setAnimateDuration(1);
 
-        loadingString = i18NBundle.format("loading");
+        loadingString = i18NBundle.format("loadingGame");
         txtButton =new TextButton(loadingString, getSkin(),"huge");
 
         //txtButton =new TextButton("[Red]Lo[Blue]ading..",getSkin(),"huge");
@@ -58,10 +60,12 @@ public class LoadingUI extends Table {
 
 
 
+
+
         add(pressAnyKeyButton).expand().fillX().bottom().row();
 
         add(txtButton).expand().fillX().bottom().row();
-        add(progressBar).expand().fillX().padBottom(20);
+        add(progressBar).expand().fillX().padBottom(10);
         bottom(); // az egész asztalt leteszi az aljára
             //debug mód a gombokhoz:
         setDebug(true,true);

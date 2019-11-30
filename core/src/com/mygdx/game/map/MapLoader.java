@@ -23,18 +23,20 @@ import com.badlogic.gdx.utils.IntMap;
 
 import static com.mygdx.game.MyTowerDefenseGame.UNIT_SCALE;
 
-public class MapCol {
+public class MapLoader {
 
-    public static final String TAG = MapCol.class.getSimpleName();
+    public static final String TAG = MapLoader.class.getSimpleName();
 
-    private final TiledMap tiledMap;
+    public TiledMap tiledMap;
     private  final Array<CollisionArea> collisionAreas;
     private final Vector2 startLocation;
     private final Array gameObjects;
     private final IntMap<Animation<Sprite>> mapAnimations;
+    private  Vector2 enemyStartLocation;
+    private Array<Vector2> enemyPath;
 
 
-    public MapCol(final TiledMap tiledMap) {
+    public MapLoader(TiledMap tiledMap) {
         this.tiledMap = tiledMap;
 
         collisionAreas = new Array<CollisionArea>();
@@ -46,6 +48,121 @@ public class MapCol {
         gameObjects = new Array<GameObject>();
         mapAnimations = new IntMap<Animation<Sprite>>();
         parseGameObjectLayer();
+
+
+        enemyStartLocation = new Vector2();
+        parseEnemyStartLocation();
+
+
+        enemyPath = new Array<Vector2>();
+        parseEnemyPathLocations();
+
+
+    }
+
+    public void loadMapLoader(final TiledMap tiledMap){
+
+        this.tiledMap = tiledMap;
+
+
+        parseCollisionLayer();
+
+        parsePlayerStartLocation();
+
+        parseGameObjectLayer();
+
+        parseEnemyStartLocation();
+
+        parseEnemyPathLocations();
+
+    }
+
+    public void clearMapLoader(){
+
+        collisionAreas.clear();
+        startLocation.set(0,0);
+        mapAnimations.clear();
+        gameObjects.clear();
+
+        enemyStartLocation.set(0,0);
+        enemyPath.clear();
+
+
+
+    }
+
+    private void parseEnemyPathLocations(){
+        //Start Locationok kiolvasása
+        //Vector2 vector = new Vector2();
+        Gdx.app.debug(TAG, "ENEMYPATH");
+
+        final MapLayer startLocationLayer = tiledMap.getLayers().get("pathFinder");
+        if (startLocationLayer == null) {
+
+            Gdx.app.debug(TAG, "There is no pathFinder layer!");
+            return;
+        }
+
+        final MapObjects objects = startLocationLayer.getObjects();
+
+        for (final MapObject mapObj : startLocationLayer.getObjects()) {
+
+            if (mapObj instanceof RectangleMapObject) {
+
+                final RectangleMapObject rectangleMapObject = (RectangleMapObject) mapObj;
+                final Rectangle rectangle = rectangleMapObject.getRectangle();
+                enemyPath.add(new Vector2(rectangle.x * UNIT_SCALE, rectangle.y * UNIT_SCALE ));
+                Gdx.app.debug(TAG,"ENEMY Path betöltve"+ enemyPath.size);
+
+            } else{
+                Gdx.app.debug(TAG,"MapObjectype" + mapObj +" is not supported for startPlayerLocation layer!");
+
+
+
+
+            }
+
+
+        }
+
+
+
+
+
+    }
+
+
+    private void parseEnemyStartLocation(){
+
+        //Start Locationok kiolvasása
+
+        final MapLayer startLocationLayer = tiledMap.getLayers().get("enemyStart");
+        if (startLocationLayer == null) {
+
+            Gdx.app.debug(TAG, "There is no enemyStart layer!");
+            return;
+        }
+
+        final MapObjects objects = startLocationLayer.getObjects();
+
+        for (final MapObject mapObj : startLocationLayer.getObjects()) {
+
+            if (mapObj instanceof RectangleMapObject) {
+
+                final RectangleMapObject rectangleMapObject = (RectangleMapObject) mapObj;
+                final Rectangle rectangle = rectangleMapObject.getRectangle();
+                enemyStartLocation.set(rectangle.x * UNIT_SCALE, rectangle.y * UNIT_SCALE );
+            } else{
+                Gdx.app.debug(TAG,"MapObjectype" + mapObj +" is not supported for startPlayerLocation layer!");
+
+
+
+
+            }
+
+
+        }
+
 
 
     }
@@ -148,8 +265,8 @@ public class MapCol {
     private void parsePlayerStartLocation() {
 
         //Start Locationok kiolvasása
-
-        final MapLayer startLocationLayer = tiledMap.getLayers().get("playerStart");
+        //ezt átnéz
+         MapLayer startLocationLayer = tiledMap.getLayers().get("playerStart");
         if (startLocationLayer == null) {
 
             Gdx.app.debug(TAG, "There is no startLocationLayer layer!");
@@ -268,13 +385,19 @@ public class MapCol {
 
     }
 
+
+
     public Vector2 getStartLocation() {
         return startLocation;
     }
 
+    public Vector2 getEnemyStartLocation() {return enemyStartLocation;}
+
     public Array<CollisionArea> getCollisionAreas() {
         return collisionAreas;
     }
+
+    public Array<Vector2> getEnemyPath() { return enemyPath; }
 
     public TiledMap getTiledMap() {
         return this.tiledMap; // nem tuti

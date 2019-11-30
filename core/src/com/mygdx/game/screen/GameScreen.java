@@ -3,34 +3,25 @@ package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.PreferenceManager;
 import com.mygdx.game.UI.GameUI;
 import com.mygdx.game.input.GameKeys;
 import com.mygdx.game.input.InputManager;
-import com.mygdx.game.map.CollisionArea;
-import com.mygdx.game.map.MapCol;
+import com.mygdx.game.map.MapLoader;
 import com.mygdx.game.map.MapListener;
 import com.mygdx.game.map.MapManager;
 import com.mygdx.game.map.MapType;
 
 
 import static com.mygdx.game.MyTowerDefenseGame.UNIT_SCALE;
+import static com.mygdx.game.UI.GameRenderer.TAG;
 
 public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 {   //private final gameTD context;
@@ -38,70 +29,48 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
     private final OrthogonalTiledMapRenderer mapRenderer;
     private final OrthographicCamera gameCamera;
     //profiler
-    private final GLProfiler profiler;
+    //private final GLProfiler profiler;
     private final MapManager mapManager;
 
     private  final PreferenceManager preferenceManager;
+
+    private  boolean button1;
+    private  boolean button2;
+    private  boolean button3;
+    private int x;
+    private int y;
 
     public GameScreen(final MyTowerDefenseGame context){
         //this.context = context;
 
         super(context);
+        Gdx.app.debug("GAMESCRRE","MOST JÖTT LÉTRE");
+
         //meg kell mondani h mi
-        mapRenderer = new OrthogonalTiledMapRenderer(null,UNIT_SCALE, context.getSpriteBatch());
-        this.gameCamera = context.getGameCamera();
+
+        mapRenderer = new OrthogonalTiledMapRenderer(null,UNIT_SCALE, context.getSpriteBatch());//létezik
+        this.gameCamera = context.getGameCamera(); //létezik
 
         //profiler
-        profiler= new GLProfiler(Gdx.graphics);
-        profiler.enable();
+       // profiler= new GLProfiler(Gdx.graphics); //nemtommi ez csk a debugra
+      //  profiler.enable(); //semtudom
 
 
-        preferenceManager = context.getPreferenceManager();
-        //player
-        //létrhozzuk a leeső tárgyakat.
-
-        /* TÖRÖLHETŐ, CSAK PÉLDÁNAK MARAD BENT
-        //EZ A SAJÁT JÁTÉK DESZKÁJA
-        bodyDef.position.set(4.6f,3);
-        //gravitációs skála, alaphelyzetből 1 es
-        bodyDef.gravityScale=0;
-        // típus
-        bodyDef.type= BodyDef.BodyType.DynamicBody;
-        //létrehozása a testnek
-        bodyBoard= world.createBody(bodyDef);
-        bodyBoard.setUserData("DESZKA");
-
-        fixtureDef.density = 1;  //erőhatások mozgatásnák kell
-        fixtureDef.isSensor = false;
-        //rugalmasság
-        fixtureDef.restitution=0;
-        //valami ragadás szerű
-        fixtureDef.friction=0.2f;
-        //filter kategória viz, játékos, fal,
-        //. maskbits- mivel ütküzhet.
-        //categoryBit. te melyik kategóribán van,.
-        fixtureDef.filter.categoryBits = BIT_BOARD;
-        fixtureDef.filter.maskBits = BIT_PLAYER ;
-        PolygonShape pShape = new PolygonShape();
-
-        pShape.setAsBox(4f,0.5f);
+        preferenceManager = context.getPreferenceManager(); //load save
 
 
-        fixtureDef.shape =pShape;
-        bodyBoard.createFixture(fixtureDef);
-        pShape.dispose();
-
-*/
-
-
+       // context.getMapManager().setEcsEngine(context.getEcsEngine());
         mapManager =context.getMapManager();
         mapManager.addMapListener(this);
-        mapManager.setMap(MapType.MAP_1);
-        //width az one world unit
-        context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartLocation(),1,1);
+
+       // initMap();
+
+
 
 
     }
+
+
 
 
 
@@ -112,13 +81,27 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 
 
 
-
-
-
-
     // dealta time always a time betwen to frames
     @Override
     public void render(float delta) {
+
+//IDE akartama touch screent
+    /*    Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
+        Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
+        //reeteleni kell mert...log oután, h a belső érteékit reszeteld
+        // 1 Bindig = 1 texture binding
+
+
+        Gdx.app.debug("NATIVE HEAP", "HEAP "+Gdx.app.getNativeHeap()/1024);
+        Gdx.app.debug("RenderInfo", ""+Gdx.graphics.getFramesPerSecond()+" FPS");
+        */
+
+     //   Gdx.app.debug("JAVA HEAP", "HEAP "+Gdx.app.getJavaHeap()/1024);
+
+
+
+//ide átpakolni a screen touch dolgokat.
+
 
 
         //force, mozgás
@@ -182,7 +165,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
         //true: fix camera
         //false: mozgathato
 
-
+        /*
 
         //TODO remove mapChange TEST stuff
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
@@ -195,12 +178,20 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
          }else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
             //preferenceManager.saveGameState();
             //a creat playert külön elmenti
-}
+        }
+
+        // Toucing screen
+
+
+    */
 
 
 
 
 }
+
+
+
     /*
        // @Override
         public void resize(int width, int height) {
@@ -209,6 +200,36 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 
         }
     */
+
+
+    public boolean isButton1() {
+        return button1;
+    }
+
+    public boolean isButton3() {
+        return button3;
+    }
+
+    public boolean isButton2() {
+        return button2;
+    }
+
+
+    public void setButton1 ( boolean bool){
+
+        button1 = bool ;
+    }
+
+    public void setButton2 ( boolean bool){
+
+        button2 = bool ;
+    }
+
+    public void setButton3 ( boolean bool){
+
+        button3 = bool ;
+    }
+
     @Override
     public void pause() {
 
@@ -230,6 +251,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
     @Override
     public void keyPressed(final InputManager manager,final GameKeys key) {
 
+
     }
 
 
@@ -239,7 +261,23 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 
 
     @Override
-    public void mapChanged(MapCol map) {
+    public void mapChanged(MapLoader map) {
 
     }
+
+    @Override
+    public void hide(){
+
+       super.hide();
+
+
+    }
+
+    public  void show(){
+
+        super.show();
+        context.mapShown = true;
+    }
+
+
 }

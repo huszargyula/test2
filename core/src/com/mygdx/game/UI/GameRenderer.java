@@ -3,12 +3,10 @@ package com.mygdx.game.UI;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,7 +18,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -32,12 +29,9 @@ import com.mygdx.game.ecs.ECSEngine;
 import com.mygdx.game.ecs.component.AnimationComponent;
 import com.mygdx.game.ecs.component.B2DComponent;
 import com.mygdx.game.ecs.component.GameObjectComponent;
-import com.mygdx.game.map.GameObject;
-import com.mygdx.game.map.MapCol;
+import com.mygdx.game.map.MapLoader;
 import com.mygdx.game.map.MapListener;
-import com.mygdx.game.map.MapManager;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 
 import box2dLight.RayHandler;
@@ -59,19 +53,23 @@ public class GameRenderer implements Disposable, MapListener {
     private final Box2DDebugRenderer box2DDebugRenderer;
     private final World world;
     //animáciokhoz
-    private final ImmutableArray<Entity> animatedEntities;
-    private final ImmutableArray<Entity> gameObjectEntities;
+    private  ImmutableArray<Entity> animatedEntities;
+    private  ImmutableArray<Entity> gameObjectEntities;
 
 
     private final Array<TiledMapTileLayer> tiledMapLayers;
     private final ObjectMap<String, TextureRegion[][]> regionCache;
     public  IntMap<Animation<Sprite>> mapAnimations;
-
+    protected final MyTowerDefenseGame context;
     //világítás
     private final RayHandler rayHandler;
 
+    private  int enemySpawner=0;
+    private int enemyCounter =0;
     //proba Dummy sprite
  //   private Sprite dummySprite;
+    private Sprite keyframeSprite2DArray[] ;
+    private Sprite keyframeSprite ;
 
 
 
@@ -79,14 +77,19 @@ public class GameRenderer implements Disposable, MapListener {
         assetManager = context.getAssetManager();
         viewport = context.getScreenViewport();
         gameCamera = context.getGameCamera();
+        this.context = context;
+        keyframeSprite = new Sprite();
+
+        //  itt 0, gamescreen!  Gdx.app.debug(TAG,"Screen Height"+ viewport.getScreenHeight());
+     //   Gdx.app.debug(TAG,"Screen Width"+ viewport.getScreenWidth());
+        gameCamera.position.set(16,9,0); // ez igy 0, 0
+        //gameCamera.update();
+
         spriteBatch = context.getSpriteBatch();
 
         animationCache = new EnumMap<AnimationType, Animation<Sprite>>(AnimationType.class);
         regionCache =new ObjectMap<String,TextureRegion[][]>();
         //renderere elérje az animációs componetnet => ezeket regosztrálja
-
-        gameObjectEntities = context.getEcsEngine().getEntitiesFor(Family.all(GameObjectComponent.class, B2DComponent.class,  AnimationComponent.class).get());
-        animatedEntities = context.getEcsEngine().getEntitiesFor(Family.all(AnimationComponent.class, B2DComponent.class).exclude(GameObjectComponent.class).get());
 
 
         mapRenderer = new OrthogonalTiledMapRenderer(null,UNIT_SCALE,spriteBatch );
@@ -94,7 +97,7 @@ public class GameRenderer implements Disposable, MapListener {
         tiledMapLayers= new Array<TiledMapTileLayer>();
 
         profiler = new GLProfiler(Gdx.graphics);
-        profiler.enable();
+       profiler.enable();
 
         if(profiler.isEnabled()){
             box2DDebugRenderer = new Box2DDebugRenderer();
@@ -109,22 +112,55 @@ public class GameRenderer implements Disposable, MapListener {
         }
         rayHandler= context.getRayHandler();
 
+
+
+    }
+
+
+    public void initGameEntities(MyTowerDefenseGame context){
+
+        gameObjectEntities = context.getEcsEngine().getEntitiesFor(Family.all(GameObjectComponent.class, B2DComponent.class,  AnimationComponent.class).get());
+        animatedEntities = context.getEcsEngine().getEntitiesFor(Family.all(AnimationComponent.class, B2DComponent.class).exclude(GameObjectComponent.class).get());
+
+
+
     }
 
     public void render(final float alpha){
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+     // context.getRenderingInfo().setPosition(10,context.getScreenViewport().getScreenHeight()-context.renderingInfo.getHeight());
+         enemySpawner++;
+        if (context.gameStarter & enemyCounter <80) {
+            //50 enemy hozza a 60at
+            //70nél ius  hozz a 60at
+            //80 már ingadozik 52-60 között
+            //90nél 40-50 között
+            //100enemy 30-35 40 fps
+            //200enemy 11-7-8 fps
+            if (enemySpawner > 100) {
+                context.getEcsEngine().createEnemy(context.getMapManager().getCurrentMap().getEnemyStartLocation(), 1, 1, context.getMapManager().getCurrentMap().getEnemyPath());
+                enemyCounter++;
+                enemySpawner=0;
+            }
+        }
 
         viewport.apply(false);
-
         mapRenderer.setView(gameCamera);
+        //statikus nézés
+
+
+
+        //TODO : alábbi sor
+        //    texture binding monitor 11es vid vége
+
 
         spriteBatch.begin(); //ami a begin és end köztt van azokata spritokat rajzolja
-        if (mapRenderer.getMap() != null) {
-            AnimatedTiledMapTile.updateAnimationBaseTime();
-
-            //egyik map renderer lehetőség, ekkor mindent rendel pl ami nem object
+        if (context.mapShown & mapRenderer.getMap() != null ) {
+            AnimatedTiledMapTile.updateAnimationBaseTime(); //a tiled map animációnak updetelése
+            ///AMI NEM OBJECT!!
+            //egyik map renderer lehetőség, ekkor mindent rendel pl
             //a tile layerek a szok sorrendben megjelennek
             //layerenként is lehetne!
             //mapRenderer.render();
@@ -136,7 +172,7 @@ public class GameRenderer implements Disposable, MapListener {
 
         }
         else{
-            Gdx.app.debug("RenderInfo", "NINCSMAP");
+        //    Gdx.app.debug("RenderInfo", "NINCSMAP");
 
 
 
@@ -147,7 +183,7 @@ public class GameRenderer implements Disposable, MapListener {
 
         }
 
-        //ANimatinon
+        //ANimatinon player
         for (final Entity entity:animatedEntities){
             renderEntity(entity,alpha);
 
@@ -158,18 +194,36 @@ public class GameRenderer implements Disposable, MapListener {
         rayHandler.setCombinedMatrix(gameCamera);
         rayHandler.updateAndRender();
 
+        /*
         if (profiler.isEnabled()) {
             //profiler bindigs kiratás
-         //   Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
-         //   Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
+
+           Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());
+            Gdx.app.debug("RenderInfo", "Drawcalls" + profiler.getDrawCalls());
             //reeteleni kell mert...log oután, h a belső érteékit reszeteld
             // 1 Bindig = 1 texture binding
-            profiler.reset();
+
+
+            Gdx.app.debug("JAVA HEAP", "HEAP "+Gdx.app.getJavaHeap()/1024);
+            Gdx.app.debug("NATIVE HEAP", "HEAP "+Gdx.app.getNativeHeap()/1024);
+            Gdx.app.debug("RenderInfo", ""+Gdx.graphics.getFramesPerSecond()+" FPS");
+
+
             //a második elem: kamera ez lehetne 3d esetén kicsit dönött pl
-            box2DDebugRenderer.render(world,gameCamera.combined);
+
 
         }
 
+
+            */
+
+        if (profiler.isEnabled()) {
+            context.heapAndFPSinfo(Gdx.graphics.getFramesPerSecond(), profiler.getDrawCalls(), profiler.getTextureBindings(), Gdx.app.getJavaHeap() / 1024, Gdx.app.getNativeHeap() / 1024);
+            profiler.reset();
+            box2DDebugRenderer.render(world,gameCamera.combined);
+
+
+        }
 
     }
 
@@ -180,7 +234,7 @@ public class GameRenderer implements Disposable, MapListener {
         final  GameObjectComponent gameObjectComponent = ECSEngine.gameObjCmpMapper.get(entity);
 
         if (gameObjectComponent.animationIndex != -1){
-
+            //TODO EZEKET IS RENDBE RAKNI
             final  Animation<Sprite> animation = mapAnimations.get(gameObjectComponent.animationIndex);
             final Sprite frame = animation.getKeyFrame(aniComponent.aniTime);
             //set bounds before origin and rotaion althought doc sasy its slightly les eff
@@ -199,18 +253,25 @@ public class GameRenderer implements Disposable, MapListener {
     }
 
     private void renderEntity(Entity entity, float alpha) {
+        //mozgása animálása a Playernek!!
 
         final B2DComponent b2DComponent =ECSEngine.b2dCmpMapper.get(entity);
         final  AnimationComponent aniComponent = ECSEngine.aniCmpMapper.get(entity);
+//hova menjenű
+//gameCamera.unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).x;
+        //gameCamera.unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).y;
+
+
 
         if (aniComponent.aniType != null){
 
             final  Animation<Sprite> animation = getAnimation(aniComponent.aniType);
             final Sprite frame = animation.getKeyFrame(aniComponent.aniTime);
 
-            b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
-            frame.setBounds(b2DComponent.renderPosition.x- b2DComponent.width*0.5f,b2DComponent.renderPosition.y - b2DComponent.height*0.5f,aniComponent.width,aniComponent.height);
-            frame.draw(spriteBatch);
+           b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
+
+           frame.setBounds(b2DComponent.renderPosition.x- b2DComponent.width*0.5f,b2DComponent.renderPosition.y - b2DComponent.height*0.5f,aniComponent.width,aniComponent.height);
+           frame.draw(spriteBatch);
 
 
         }else{
@@ -219,8 +280,10 @@ public class GameRenderer implements Disposable, MapListener {
 
         }
 
-        b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
-      //animation widht height component
+        //b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
+
+
+        //animation widht height component
        // dummySprite.setBounds(b2DComponent.renderPosition.x- b2DComponent.width*0.5f,b2DComponent.renderPosition.y - b2DComponent.height*0.5f,b2DComponent.width,b2DComponent.height);
        // dummySprite.draw(spriteBatch);
 
@@ -256,12 +319,21 @@ public class GameRenderer implements Disposable, MapListener {
 
     //2D-s tömböt 1_D spritetá
     private Sprite [] getKeyFrames(TextureRegion[] textureRegion) {
+      //TODO ezt átirni h ne kreáljon mindig uj spritot FONTOS
+      //itt minidig uj spr
+        getKeyFremesSPriteReset();
+      //  final  Sprite[] keyFrames = new Sprite[textureRegion.length];
+       // keyframeSprite2DArray
         final  Sprite[] keyFrames = new Sprite[textureRegion.length];
-
-
              int i =0;
             for (final TextureRegion region:textureRegion){
-                final Sprite sprite = new Sprite(region);
+               final Sprite sprite = new Sprite(region);
+              //  keyframeSprite.setRegion(region);
+               // keyframeSprite.setColor(1, 1, 1, 1);
+               // keyframeSprite.setSize(region.getRegionWidth(), region.getRegionHeight());
+               // keyframeSprite.setOrigin(keyframeSprite.getWidth() / 2, keyframeSprite.getHeight() / 2);
+
+
                 sprite.setOriginCenter();
                 keyFrames[i++]=sprite;
 
@@ -274,6 +346,12 @@ public class GameRenderer implements Disposable, MapListener {
     }
 
 
+    public void getKeyFremesSPriteReset(){
+        keyframeSprite2DArray = null;
+
+
+    }
+
     @Override
     public void dispose() {
 
@@ -285,12 +363,12 @@ public class GameRenderer implements Disposable, MapListener {
     }
 
     @Override
-    public void mapChanged(MapCol map) {
+    public void mapChanged(MapLoader map) {
         mapRenderer.setMap(map.getTiledMap());
 
         map.getTiledMap().getLayers().getByType(TiledMapTileLayer.class,tiledMapLayers);
         mapAnimations =map.getMapAnimations();
-  //      if (dummySprite == null){
+    //     if (dummySprite == null){
 
     //        dummySprite =  assetManager.get("charracters_effects/effect.atlas", TextureAtlas.class ).createSprite("exp2");
             //width , height /2 lesz a rotation center

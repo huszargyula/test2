@@ -1,6 +1,6 @@
 package com.mygdx.game.map;
 
 public interface MapListener {
-    void mapChanged(final MapCol map);
+    void mapChanged(final MapLoader map);
 
 }

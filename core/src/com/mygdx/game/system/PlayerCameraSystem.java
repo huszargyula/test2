@@ -22,7 +22,7 @@ public class PlayerCameraSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         //gamekamera mpzgatás
-        gameCamera.position.set(ECSEngine.b2dCmpMapper.get(entity).renderPosition,0);
+       gameCamera.position.set(ECSEngine.b2dCmpMapper.get(entity).renderPosition,0);
 
     }
 }

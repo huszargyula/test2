@@ -3,12 +3,9 @@ package com.mygdx.game.map;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.MyTowerDefenseGame;
@@ -27,28 +24,34 @@ public class MapManager {
     private final Array<Body> bodies;
 
     private final AssetManager assetManager;
-    private final ECSEngine ecsEngine;
+    private  ECSEngine ecsEngine;
     private final Array<Entity> gameObjectsToRemove;
 
-    private MapType currentMapType;
-    private MapCol currentMap; //ez sztem MAPCOl
-    private final EnumMap<MapType, MapCol> mapCache;
+   private MapLoader currentMap; //loader
     private final Array<MapListener> listeners;
 
+
     public MapManager(final MyTowerDefenseGame context) {
-        currentMapType = null;
-        currentMap = null;
+
         world = context.getWorld();
-        ecsEngine =context.getEcsEngine();
-        gameObjectsToRemove = new Array<Entity>();
         assetManager = context.getAssetManager();
         bodies = new Array<Body>();
-        mapCache = new EnumMap<MapType, MapCol>(MapType.class);
-        listeners = new Array<MapListener>();
+
+        gameObjectsToRemove = new Array<Entity>();
+        listeners = new Array<MapListener>(); // ? ez csak a térképváltáshoz?
 
 
 
     }
+
+
+
+    public void setEcsEngine(ECSEngine engine){
+
+
+        this.ecsEngine = engine;//proba
+    }
+
 
     public void addMapListener(final MapListener listener) {
         listeners.add(listener);
@@ -56,6 +59,54 @@ public class MapManager {
     }
 
     public void setMap(final MapType type) {
+
+        //ilyen nem lesz már a nagy
+
+
+       // if (currentMap != null) {
+//TODO ezt lehet itt ?
+            world.getBodies(bodies);
+
+
+
+
+        Gdx.app.debug(TAG, "Changing to map" + type);
+
+
+            Gdx.app.debug(TAG, "Creatin new map of type" + type);
+
+            //TODO ezt se kell minden térkép betöéltésnél
+            final TiledMap tiledMap = assetManager.get(type.getFilePath(), TiledMap.class); //
+
+
+        if (currentMap!=null){
+
+            currentMap.clearMapLoader();
+            currentMap.loadMapLoader(tiledMap);
+        }
+
+        if (currentMap==null) {
+            currentMap = new MapLoader(tiledMap);
+
+        }
+
+
+        spawnCollisionAreas();
+        spawnGameObjects();
+
+        for (final MapListener listener : listeners) {
+            listener.mapChanged(currentMap);
+
+        }
+
+    }
+
+
+    //EREDETI
+/*
+    public void setMap(final MapType type) {
+
+        //ilyen nem lesz már a nagyobb mapok miatt!
         if (currentMapType == type) {
             //map is already yet
             return;
@@ -68,15 +119,20 @@ public class MapManager {
             destroyCollisionAreas();
             destroyGameObjects();
         }
+
+
         //set newmap
         Gdx.app.debug(TAG, "Changing to map" + type);
         currentMap = mapCache.get(type);
 
         if (currentMap == null){
             Gdx.app.debug(TAG, "Creatin new map of type" + type);
-            final TiledMap tiledMap = assetManager.get(type.getFilePath(), TiledMap.class);
-            currentMap = new MapCol(tiledMap);
-            mapCache.put(type,currentMap);
+            final TiledMap tiledMap = assetManager.get(type.getFilePath(), TiledMap.class); //ezt is scak nullázuk
+            currentMap = new MapLoader(tiledMap);
+            //     currentMap.clearMapLoadera();
+            //    currentMap.loadMapLoader(tiledMap);
+            //kell új ?
+            mapCache.put(type,currentMap); // ha nincs cahs, akkor felesleges!
 
         }
 
@@ -92,20 +148,45 @@ public class MapManager {
 
     }
 
-    private void destroyGameObjects() {
+*/
+    public void destroyGameObjects() {
         //két külön tárolás az array index átugrása miatt
+        //volt:
+        /*
         for (final Entity entity: ecsEngine.getEntities()){
             if (ECSEngine.gameObjCmpMapper.get(entity)!=null){//26:41
                 gameObjectsToRemove.add(entity);
-
             }
-        }
 
+        }
         for (final Entity entity :gameObjectsToRemove){
 
             ecsEngine.removeEntity(entity);
         }
+
+
+
         gameObjectsToRemove.clear();
+
+        */
+        ///---uj :minden entity törlésre kerül
+
+
+        for (final Entity entity: ecsEngine.getEntities()){
+               gameObjectsToRemove.add(entity);
+
+
+        }
+        for (final Entity entity :gameObjectsToRemove){
+
+            ecsEngine.removeEntity(entity);
+        }
+
+
+
+        gameObjectsToRemove.clear();
+
+
     }
 
     private void spawnGameObjects() {
@@ -117,7 +198,7 @@ public class MapManager {
 
     }
 
-    private void destroyCollisionAreas(){
+    public void destroyCollisionAreas(){
 
         for (final Body body :bodies){
 
@@ -167,7 +248,7 @@ public class MapManager {
     }
 
 
-    public MapCol getCurrentMap(){return currentMap;}
+    public MapLoader getCurrentMap(){return currentMap;}
 
 
 }

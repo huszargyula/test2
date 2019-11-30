@@ -16,6 +16,9 @@
     "huge": {
       "font": "font_32"
 
+    },"default": {
+      "font": "font_20"
+
     }
   },
 

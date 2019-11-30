@@ -27,9 +27,11 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -59,6 +61,7 @@ public class MyTowerDefenseGame extends Game {
 		public static final short BIT_CIRCLE =1<<3;
 		public static final short BIT_BOARD =1<<4;
 		public static final short	BIT_GAME_OBJECT =1<<5;
+		public static final short BIT_BUTTON=1<<6;
 		/// ///////// a fizikai világ látrehozása
 		private World world;
 
@@ -66,7 +69,7 @@ public class MyTowerDefenseGame extends Game {
 		//Collision detect
 		public static final BodyDef BODY_DEF = new BodyDef(); // ez a kettő a leeséshez, fizikai enginhez kell
 		public static final FixtureDef FIXTURE_DEF = new FixtureDef(); // fixture jelentése kellék, alkatrész
-
+		public int loadingMapId;
 
 
 	//delta time fixing
@@ -77,6 +80,8 @@ public class MyTowerDefenseGame extends Game {
 		private OrthographicCamera gameCamera;
 		public static final float UNIT_SCALE = 1/32f; //az egsség
 		private SpriteBatch spriteBatch; //ez a texutárák rendeleléséhez kell
+
+		public boolean mapShown;
 
 	//audio
 		private AudioManager audioManager;
@@ -104,16 +109,23 @@ public class MyTowerDefenseGame extends Game {
 	// mentés
 
 	private PreferenceManager preferenceManager;
+	public boolean gameStarter;
+//REndering, and heap info:
+	public TextButton renderingInfo;
+	private StringBuilder stringBuilder;
+	private  TmxMapLoader tmxMapLoader;
 
-		public void create(){
+
+	public void create(){
 
 			spriteBatch = new SpriteBatch();
 			Gdx.app.setLogLevel(Application.LOG_DEBUG);
-
+			mapShown = false;
+			gameStarter = false;
 			//		//fixing delta time
 			accumulator = 0;
 
-			//Fizikai engineincializálása
+			//Fizikai engine incializálása
 			Box2D.init();
 			//gravitáció, csak y tengely mentén, ha nem mozog, akkor a grav erőst kikcsapolja
 			//méter, másodperc, kg
@@ -127,7 +139,7 @@ public class MyTowerDefenseGame extends Game {
 			//világítás
 			rayHandler = new RayHandler(world);
 			//alap fény létrehzoás
-			rayHandler.setAmbientLight(0,0,0,0.2f);
+			rayHandler.setAmbientLight(0,0,0,1f);
 			// a többi fény a B2d componetnben!!
 
 
@@ -137,12 +149,17 @@ public class MyTowerDefenseGame extends Game {
 			//assetMannger inicializálása
 			assetManager = new AssetManager();
 			// beálít h tudjon tildemapat loadoljon
-			assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
+			tmxMapLoader= new  TmxMapLoader(assetManager.getFileHandleResolver());
+			assetManager.setLoader(TiledMap.class,tmxMapLoader);
+
+			//betűk, string texturák inicializása
 			initalizeSkin();
+
 			//itt a screensize!!
-
-			stage = new Stage(new FitViewport(450,800),spriteBatch); //??
-
+			// ez csak a bbetük gomboknál számít
+			//Kamera felbontás
+			stage = new Stage(new FitViewport(800,450),spriteBatch); //??
+			//Gdx.input.setInputProcessor(stage);
 
 			//audio
 			audioManager = new AudioManager(this);
@@ -157,33 +174,42 @@ public class MyTowerDefenseGame extends Game {
 			gameCamera = new OrthographicCamera();
 			//screentypeok létrehozása
 			//9:16 a mobilok / képernyők általános képernyő aránya. ennek utánajárni!
-			screenViewport = new FitViewport(18,16, gameCamera);
+			//ennek a fele a camere setposition ??
+			screenViewport = new FitViewport(32,18, gameCamera);
+
 
 			//FONTOS A SORREND!!!!!
 			//create Ecsengine
-			ecsEngine = new ECSEngine(this);
-
 			//setup Mapmanger
-			mapManager = new MapManager(this);
+		mapManager = new MapManager(this);
 
 
+		ecsEngine = new ECSEngine(this);
 
-
-
+		mapManager.setEcsEngine(getEcsEngine());
 
 			// create gameRenderer
 
 			gameRenderer = new GameRenderer(this);
-
-			//preferenc manager
+			gameRenderer.initGameEntities(this);
+			//preferenc manager load-save
 			preferenceManager = new PreferenceManager();
 
 			//set first screen
 			screenCache = new EnumMap<ScreenType, AbstractScreen>(ScreenType.class);
-			setScreen(ScreenType.LOADING);
+			setScreen(ScreenType.LOADINGMENU);
 
 
-		}
+		renderingInfo = new TextButton("", getSkin());
+		this.getStage().addActor(renderingInfo);
+
+		//TODO HARD CODED
+		renderingInfo.setPosition(400,350);
+
+		// renderingInfo.setPosition(  400 ,this.getScreenViewport().getScreenHeight()- renderingInfo.getHeight());
+
+
+	}
 
 		public Stage getStage() {
 			return stage;
@@ -193,7 +219,7 @@ public class MyTowerDefenseGame extends Game {
 			return skin;
 		}
 
-		private void initalizeSkin(){
+		public void initalizeSkin(){
 
 			//setup markup colors
 			Colors.put("Red", Color.RED);
@@ -232,6 +258,7 @@ public class MyTowerDefenseGame extends Game {
 			// az assetmanager furán kezeli- lhetet bugosan, szval ezért rajta kivül dolgozunk
 			//Skin parameter pl utvonal
 
+
 			final SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("ui/hud.atlas",resources);
 
 			assetManager.load("ui/hud.json", Skin.class, skinParameter);
@@ -244,42 +271,57 @@ public class MyTowerDefenseGame extends Game {
 			i18NBundle = assetManager.get("ui/strings",I18NBundle.class);
 
 
+
+
 		}
 
-	public MapManager getMapManager(){return mapManager ;}
 
-	public ECSEngine getEcsEngine() {
-		return ecsEngine;
+	public void heapAndFPSinfo(float FPS,float drawCalls, float textBind, float javaheap, float nativeheap) {
+
+
+		//txtButtob ddinamikus updetealése
+		stringBuilder = renderingInfo.getLabel().getText();
+		stringBuilder.setLength(0);
+		//...
+		stringBuilder.append("FPS: ");
+		stringBuilder.append(" ");
+		stringBuilder.append(FPS);
+
+		stringBuilder.append("DrC: ");
+		stringBuilder.append(" ");
+		stringBuilder.append(drawCalls);
+
+		stringBuilder.append("TxB: ");
+		stringBuilder.append(" ");
+		stringBuilder.append(textBind);
+
+		stringBuilder.append("Jh: ");
+		stringBuilder.append(javaheap);
+		stringBuilder.append(" Kby ");
+
+		stringBuilder.append("Nh: ");
+		stringBuilder.append(" ");
+		stringBuilder.append(nativeheap);
+		stringBuilder.append(" Kby ");
+
+
+		//   stringBuilder.append("% }");
+		//rendszerértesítés h a szövegben változás van, ujra kell renderelni
+		renderingInfo.getLabel().invalidateHierarchy();
+
+
+
+
 	}
 
-	public InputManager getInputManager() {
-		return inputManager;
+	public TextButton getRenderingInfo() {
+		return renderingInfo;
 	}
 
-	public FitViewport getScreenViewport(){return screenViewport;}
 
 
-		public AssetManager getAssetManager(){
 
-			return assetManager;
-		}
-
-		public OrthographicCamera getGameCamera(){
-			return  gameCamera;
-
-		}
-
-		public SpriteBatch getSpriteBatch() {
-			return spriteBatch;
-		}
-
-		public  World getWorld(){
-
-			return world;
-		}
-
-
-		//megfelelő képernyő beállítás
+	//megfelelő képernyő beállítás
 		public  void setScreen(final ScreenType screenType){
 
 
@@ -310,19 +352,6 @@ public class MyTowerDefenseGame extends Game {
 
 		}
 
-		@Override
-		public void dispose(){
-			super.dispose();
-			gameRenderer.dispose();
-			rayHandler.dispose();
-			world.dispose();
-			assetManager.dispose(); // bonyim játéknál menet közben
-			//dispos, ! utnaolvas
-			spriteBatch.dispose();
-			stage.dispose();
-
-		}
-
 
 		@Override
 		public void render(){
@@ -331,6 +360,7 @@ public class MyTowerDefenseGame extends Game {
 
 			final float deltaTime = Math.min(0.25f, Gdx.graphics.getRawDeltaTime());
 
+		//if (gameStarter) {
 			ecsEngine.update(deltaTime);
 			//probaképp ill érdekességkép kirjuk az a két frame közötti idő
 			//	Gdx.app.debug(TAG, "idő eltelte két frame között"+Gdx.graphics.getRawDeltaTime());
@@ -344,28 +374,33 @@ public class MyTowerDefenseGame extends Game {
 			// world.step(Gdx.graphics.getRawDeltaTime(), 6,2);
 
 
-
 			accumulator += deltaTime;
 
-			while(accumulator>= FIXED_TIME_STEP){
-
-				world.step(FIXED_TIME_STEP, 6,2);
-				accumulator-= FIXED_TIME_STEP;
+			//fizikia világ rendelrelése: a két iteráor most kb optimális, de lehet változtatni hogy pontosabb
+			// legyen, ennek utána lehet olvasni ha kell
+			//BOX2D debugrenderer a game rendererben !!!
+			while (accumulator >= FIXED_TIME_STEP) {
+				// TODO save the previos position of the body
+				world.step(FIXED_TIME_STEP, 6, 2);
+				accumulator -= FIXED_TIME_STEP;
 
 			}
-
+			//TODO calculate rendesposition from previous position and real body pos
 
 
 			//mennyi idő van a köv frameing
 			//final float alpha =accumulator/FIXED_TIME_STEP;
 			//később ki lehet simitani a rendereinget ez a későbbiekre
 			//interpolációs rendering
-
+	//	}
 
 			gameRenderer.render(accumulator/FIXED_TIME_STEP);
 			//valami történik az uI-val villog, kihajvánol => az act updateli
+			//ezek a staghez hozzárendelet gombok TABlek rajzolása, efektjei.
+
+
 			stage.getViewport().apply(); //draw elött v rener elött mindig meg kell hívni
-// Video 16 12:20
+			// Video 16 12:20
 			stage.act(deltaTime);
 			stage.draw();
 
@@ -391,6 +426,12 @@ public class MyTowerDefenseGame extends Game {
 	}
 
 
+
+
+	public GameRenderer getGameRenderer() {
+		return gameRenderer;
+	}
+
 	public I18NBundle getI18NBundle() {
 		return i18NBundle;
 	}
@@ -409,5 +450,55 @@ public class MyTowerDefenseGame extends Game {
 
 	public PreferenceManager getPreferenceManager() {
 		return preferenceManager;
+	}
+
+	public MapManager getMapManager(){return mapManager ;}
+
+	public ECSEngine getEcsEngine() {
+		return ecsEngine;
+	}
+
+
+	public InputManager getInputManager() {
+		return inputManager;
+	}
+
+	public FitViewport getScreenViewport(){return screenViewport;}
+
+
+	public AssetManager getAssetManager(){ return assetManager; }
+
+	public OrthographicCamera getGameCamera(){ return  gameCamera; }
+
+	public SpriteBatch getSpriteBatch() {
+		return spriteBatch;
+	}
+
+	public  World getWorld(){ return world;}
+
+	public int getLoadingMapId() {
+		return loadingMapId;
+	}
+
+	public void setLoadingMapId(int loadingMapId) {
+		this.loadingMapId = loadingMapId;
+	}
+
+	@Override
+	public void dispose(){
+		super.dispose();
+		gameRenderer.dispose();
+		rayHandler.dispose();
+		world.dispose();
+		assetManager.dispose(); // bonyim játéknál menet közben
+		//dispos, ! utnaolvas
+		spriteBatch.dispose();
+		stage.dispose();
+
+	}
+
+
+	public TmxMapLoader getAssetTiledLoader() {
+		return this.tmxMapLoader;
 	}
 }
