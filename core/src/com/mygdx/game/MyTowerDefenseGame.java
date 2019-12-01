@@ -28,6 +28,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -106,6 +107,7 @@ public class MyTowerDefenseGame extends Game {
 	//világítás
 	private RayHandler rayHandler;
 
+
 	// mentés
 
 	private PreferenceManager preferenceManager;
@@ -116,6 +118,10 @@ public class MyTowerDefenseGame extends Game {
 	private  TmxMapLoader tmxMapLoader;
 
 
+	//TODO get Set
+	public Array<Integer> playerIconId;
+
+
 	public void create(){
 
 			spriteBatch = new SpriteBatch();
@@ -124,7 +130,7 @@ public class MyTowerDefenseGame extends Game {
 			gameStarter = false;
 			//		//fixing delta time
 			accumulator = 0;
-
+			playerIconId = new Array<Integer>();
 			//Fizikai engine incializálása
 			Box2D.init();
 			//gravitáció, csak y tengely mentén, ha nem mozog, akkor a grav erőst kikcsapolja
@@ -158,8 +164,10 @@ public class MyTowerDefenseGame extends Game {
 			//itt a screensize!!
 			// ez csak a bbetük gomboknál számít
 			//Kamera felbontás
-			stage = new Stage(new FitViewport(800,450),spriteBatch); //??
-			//Gdx.input.setInputProcessor(stage);
+			stage = new Stage(new FitViewport(Gdx.graphics.getWidth(),Gdx.graphics.getHeight()),spriteBatch); //??
+//		stage = new Stage(new FitViewport(800,450),spriteBatch); //??
+
+		//Gdx.input.setInputProcessor(stage);
 
 			//audio
 			audioManager = new AudioManager(this);
@@ -204,7 +212,7 @@ public class MyTowerDefenseGame extends Game {
 		this.getStage().addActor(renderingInfo);
 
 		//TODO HARD CODED
-		renderingInfo.setPosition(400,350);
+		renderingInfo.setPosition(400,420);
 
 		// renderingInfo.setPosition(  400 ,this.getScreenViewport().getScreenHeight()- renderingInfo.getHeight());
 
@@ -476,8 +484,9 @@ public class MyTowerDefenseGame extends Game {
 
 	public  World getWorld(){ return world;}
 
+	//TODO hard COded
 	public int getLoadingMapId() {
-		return loadingMapId;
+		return 2;
 	}
 
 	public void setLoadingMapId(int loadingMapId) {

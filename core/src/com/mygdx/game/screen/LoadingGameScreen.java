@@ -99,7 +99,7 @@ public class LoadingGameScreen extends AbstractScreen<LoadingGameUI>
         //effekt betoltése
 //TODO ezek kitoltése betöltött utak elmentése
         assetManager.load("charracters_effects/effect.atlas", TextureAtlas.class );
-        assetManager.load("anim/bird_anim.atlas", TextureAtlas.class );
+        assetManager.load("anim/bird_anim2.atlas", TextureAtlas.class );
         assetManager.load("anim/button.atlas",TextureAtlas.class);
 
         //1 darab map betöltése
@@ -146,9 +146,6 @@ public class LoadingGameScreen extends AbstractScreen<LoadingGameUI>
         //width az one world unit
         //0áznmi
         //TODO fonots, amit elöbb rajzol, az lesz  hátul a rétegekben
-        context.getEcsEngine().createGameButton(new Vector2(28.0f,1),2,2);
-        context.getEcsEngine().createGameButton(new Vector2(30.5f,1),2,2);
-
 
 
         context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation(),2,2);

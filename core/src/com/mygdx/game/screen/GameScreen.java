@@ -3,12 +3,15 @@ package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.PreferenceManager;
 import com.mygdx.game.UI.GameUI;
@@ -33,12 +36,20 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
     private final MapManager mapManager;
 
     private  final PreferenceManager preferenceManager;
+    int i ;
+    float health;
+
+
+
 
     private  boolean button1;
     private  boolean button2;
     private  boolean button3;
     private int x;
     private int y;
+
+    private  int enemySpawner=0;
+    private int enemyCounter =0;
 
     public GameScreen(final MyTowerDefenseGame context){
         //this.context = context;
@@ -67,11 +78,10 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
 
 
 
+     i=1;
+     health =1;
 
     }
-
-
-
 
 
     @Override
@@ -84,6 +94,27 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
     // dealta time always a time betwen to frames
     @Override
     public void render(float delta) {
+
+
+
+                // context.getRenderingInfo().setPosition(10,context.getScreenViewport().getScreenHeight()-context.renderingInfo.getHeight());
+
+        enemySpawner++;
+        if (context.gameStarter & enemyCounter <80) {
+            //50 enemy hozza a 60at
+            //70nél ius  hozz a 60at
+            //80 már ingadozik 52-60 között
+            //90nél 40-50 között
+            //100enemy 30-35 40 fps
+            //200enemy 11-7-8 fps
+            if (enemySpawner > 100) {
+                context.getEcsEngine().createEnemy(context.getMapManager().getCurrentMap().getEnemyStartLocation(), 1, 1, context.getMapManager().getCurrentMap().getEnemyPath());
+                enemyCounter++;
+                enemySpawner=0;
+            }
+        }
+
+
 
 //IDE akartama touch screent
     /*    Gdx.app.debug("RenderInfo", "Bindings" + profiler.getTextureBindings());

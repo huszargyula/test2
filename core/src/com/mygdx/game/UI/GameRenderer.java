@@ -29,6 +29,7 @@ import com.mygdx.game.ecs.ECSEngine;
 import com.mygdx.game.ecs.component.AnimationComponent;
 import com.mygdx.game.ecs.component.B2DComponent;
 import com.mygdx.game.ecs.component.GameObjectComponent;
+import com.mygdx.game.ecs.component.HealthBarComponent;
 import com.mygdx.game.map.MapLoader;
 import com.mygdx.game.map.MapListener;
 
@@ -55,6 +56,7 @@ public class GameRenderer implements Disposable, MapListener {
     //animáciokhoz
     private  ImmutableArray<Entity> animatedEntities;
     private  ImmutableArray<Entity> gameObjectEntities;
+    private ImmutableArray<Entity> healtBarEntities;
 
 
     private final Array<TiledMapTileLayer> tiledMapLayers;
@@ -64,8 +66,6 @@ public class GameRenderer implements Disposable, MapListener {
     //világítás
     private final RayHandler rayHandler;
 
-    private  int enemySpawner=0;
-    private int enemyCounter =0;
     //proba Dummy sprite
  //   private Sprite dummySprite;
     private Sprite keyframeSprite2DArray[] ;
@@ -121,7 +121,8 @@ public class GameRenderer implements Disposable, MapListener {
 
         gameObjectEntities = context.getEcsEngine().getEntitiesFor(Family.all(GameObjectComponent.class, B2DComponent.class,  AnimationComponent.class).get());
         animatedEntities = context.getEcsEngine().getEntitiesFor(Family.all(AnimationComponent.class, B2DComponent.class).exclude(GameObjectComponent.class).get());
-
+        healtBarEntities= context.getEcsEngine().getEntitiesFor(Family.all(HealthBarComponent.class).get());
+                //TODO kirajzol.
 
 
     }
@@ -130,21 +131,7 @@ public class GameRenderer implements Disposable, MapListener {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-     // context.getRenderingInfo().setPosition(10,context.getScreenViewport().getScreenHeight()-context.renderingInfo.getHeight());
-         enemySpawner++;
-        if (context.gameStarter & enemyCounter <80) {
-            //50 enemy hozza a 60at
-            //70nél ius  hozz a 60at
-            //80 már ingadozik 52-60 között
-            //90nél 40-50 között
-            //100enemy 30-35 40 fps
-            //200enemy 11-7-8 fps
-            if (enemySpawner > 100) {
-                context.getEcsEngine().createEnemy(context.getMapManager().getCurrentMap().getEnemyStartLocation(), 1, 1, context.getMapManager().getCurrentMap().getEnemyPath());
-                enemyCounter++;
-                enemySpawner=0;
-            }
-        }
+
 
         viewport.apply(false);
         mapRenderer.setView(gameCamera);
@@ -188,6 +175,14 @@ public class GameRenderer implements Disposable, MapListener {
             renderEntity(entity,alpha);
 
         }
+
+        for (final Entity entity:healtBarEntities){
+
+
+            setProgressHealtBar(entity);
+        }
+
+
         spriteBatch.end();
 
         //világitás
@@ -227,6 +222,16 @@ public class GameRenderer implements Disposable, MapListener {
 
     }
 
+    private void setProgressHealtBar(Entity entity){
+
+        final HealthBarComponent healthBarComponent =ECSEngine.healthBarCmpMapper.get(entity);
+
+        healthBarComponent.healtBar.setValue(healthBarComponent.healthBarPercentege);
+
+
+
+    }
+
     private void renderGameObject(Entity entity, float alpha) {
 
         final B2DComponent b2DComponent =ECSEngine.b2dCmpMapper.get(entity);
@@ -251,6 +256,10 @@ public class GameRenderer implements Disposable, MapListener {
 
 
     }
+
+
+
+
 
     private void renderEntity(Entity entity, float alpha) {
         //mozgása animálása a Playernek!!

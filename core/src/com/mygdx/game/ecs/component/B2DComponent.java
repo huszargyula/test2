@@ -22,7 +22,7 @@ public class B2DComponent implements Component, Pool.Poolable {
     public boolean directionsSetted;
 
     // hová kattintott a játékos
-    public Vector3 setDirection= new Vector3();
+//    public Vector3 setDirection= new Vector3();
 
 
     //animáciohoz
@@ -31,7 +31,7 @@ public class B2DComponent implements Component, Pool.Poolable {
     @Override
     public void reset() {
 
-        setDirection.set(0,0,0);
+       //setDirection.set(0,0,0);
          lightDistance =0;
          lightFluctuacionDistance =0;
          lightFluctuacionTime=0;

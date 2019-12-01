@@ -3,6 +3,7 @@ package com.mygdx.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
@@ -12,6 +13,7 @@ import com.mygdx.game.MyTowerDefenseGame;
 import com.mygdx.game.ecs.ECSEngine;
 import com.mygdx.game.ecs.component.B2DComponent;
 import com.mygdx.game.ecs.component.PlayerComponent;
+import com.mygdx.game.ecs.component.PlayerIconComponent;
 import com.mygdx.game.input.GameKeyInputListener;
 import com.mygdx.game.input.GameKeys;
 import com.mygdx.game.input.InputManager;
@@ -26,9 +28,12 @@ public class PlayerMovmentSystem extends IteratingSystem implements GameKeyInput
     private int antiWiggleFactorX;
     private int antiWiggleFactorY;
     public OrthographicCamera camer;
+    public MyTowerDefenseGame context;
+
 
     public boolean isSelected;
-
+  //  MyTowerDefenseGame context;
+    public ImmutableArray<Entity> playerIconEntites;
 
 
     public PlayerMovmentSystem(final MyTowerDefenseGame context) {
@@ -45,6 +50,8 @@ public class PlayerMovmentSystem extends IteratingSystem implements GameKeyInput
       //  directionChange =false; //ezt és ennek meghívását ki lehet kommentelni
         xFactor=yFactor =0;
         antiWiggleFactorX = antiWiggleFactorY =1;
+        this.context = context;
+
     }
 
     //ez elvileg minden entitásra meg lesz hívva ami a "familye" része
@@ -52,13 +59,15 @@ public class PlayerMovmentSystem extends IteratingSystem implements GameKeyInput
     protected void processEntity(Entity entity, float deltaTime) {
         //el kell érnünk az összes komponensünk a meghíváshoz: Component mapper az enginben
         //entity.getComponent(PlayerComponent.class); ez lenne alapból, de ez lassú megoldás!!
+        playerIconEntites = context.getEcsEngine().getEntitiesFor(Family.all( PlayerIconComponent.class).get());
+        final  PlayerComponent playerComponent=  ECSEngine.playerCmpMapper.get(entity); // ez ugyanaz mint a felette levő, csak component mapperrel, gyorsabb
+        final  B2DComponent b2dComponent = ECSEngine.b2dCmpMapper.get(entity);
+
+
 
 
         //PLAYER Mozgatása
        // if (directionChange) {
-            final  PlayerComponent playerComponent=  ECSEngine.playerCmpMapper.get(entity); // ez ugyanaz mint a felette levő, csak component mapperrel, gyorsabb
-            final  B2DComponent b2dComponent = ECSEngine.b2dCmpMapper.get(entity);
-
 
 //////////////////////////////////////////////////////////////
   /*
@@ -131,7 +140,7 @@ directionChange =false; //ne hívodjon minig meg
       //  Gdx.app.debug(TAG, "Screen is touched " + Gdx.input.getX());
 
 
-        if ( b2dComponent.setDirection.x >b2dComponent.body.getPosition().x ){
+        if ( playerComponent.setDirection.x >b2dComponent.body.getPosition().x ){
 
           xFactor =1;
 
@@ -140,7 +149,7 @@ directionChange =false; //ne hívodjon minig meg
             xFactor =-1;
         }
 
-       if ( b2dComponent.setDirection.y >b2dComponent.body.getPosition().y){
+       if ( playerComponent.setDirection.y >b2dComponent.body.getPosition().y){
 
             yFactor =1;
 
@@ -151,7 +160,7 @@ directionChange =false; //ne hívodjon minig meg
 
        }
 
-       if (b2dComponent.setDirection.x == 0 & b2dComponent.setDirection.y == 0){
+       if (playerComponent.setDirection.x == 0 & playerComponent.setDirection.y == 0){
 
            xFactor=yFactor=0;
         }
@@ -223,6 +232,15 @@ directionChange =false; //ne hívodjon minig meg
 
  */
 
+            //b2dComponent.body.applyAngularImpulse();
+        if (Math.abs(playerComponent.setDirection.x-b2dComponent.body.getPosition().x)<0.5f &  Math.abs(playerComponent.setDirection.y-b2dComponent.body.getPosition().y)<0.5f) {
+
+            playerComponent.setDirection.x = 0;
+            playerComponent.setDirection.y = 0;
+        }
+
+
+
 
             b2dComponent.body.applyLinearImpulse(
 
@@ -233,6 +251,7 @@ directionChange =false; //ne hívodjon minig meg
 
 
             );
+
 
 
    //     }
