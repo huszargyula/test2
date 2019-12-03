@@ -24,9 +24,24 @@
 
   "com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle": {
     "default": {
-      "background": "knob_after",
-      "knob": "knob",
-      "knobBefore": "knob_before"
+      "background": "hp_after",
+      "knob": "load",
+      "knobBefore": "load_before"
+    },
+    "load": {
+      "background": "hp_after",
+      "knob": "load",
+      "knobBefore": "load_before"
+    },
+    "hp": {
+      "background": "hp_after",
+      "knob": "hp",
+      "knobBefore": "hp_before"
+    },
+    "mana": {
+      "background": "hp_after",
+      "knob": "mana",
+      "knobBefore": "mana_before"
     }
   }
 

@@ -57,7 +57,7 @@ public class MyTowerDefenseGame extends Game {
 
 		//16 kategoria az alakzatoknak általában ésekkel operál ami gyors
 		public static final short BIT_PLAYER =1<<0; // az 1 est 0 pozicióval mozgatjuk balra azaz 0000 0000 0000 0001
-		public static final short BIT_BOX =1<<1;	// az 1 est 0 pozicióval mozgatjuk balra azaz 0000 0000 0000 0010
+		public static final short BIT_ENEMY =1<<1;	// az 1 est 0 pozicióval mozgatjuk balra azaz 0000 0000 0000 0010
 		public static final short BIT_GROUND =1<<2; // az 1 est 0 pozicióval mozgatjuk balra azaz 0000 0000 0000 0100
 		public static final short BIT_CIRCLE =1<<3;
 		public static final short BIT_BOARD =1<<4;
@@ -267,7 +267,7 @@ public class MyTowerDefenseGame extends Game {
 			//Skin parameter pl utvonal
 
 
-			final SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("ui/hud.atlas",resources);
+			final SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("ui/prog_bar.atlas",resources);
 
 			assetManager.load("ui/hud.json", Skin.class, skinParameter);
 			//kül nyelvek betűi: betöltése

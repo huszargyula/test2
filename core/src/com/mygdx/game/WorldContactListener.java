@@ -11,10 +11,11 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
 
 
+import static com.mygdx.game.MyTowerDefenseGame.BIT_ENEMY;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_GAME_OBJECT;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_PLAYER;
 
-public class WorldContactListener implements ContactListener {
+public class    WorldContactListener implements ContactListener {
     private final Array<PlayerCollisionListener> listeners;
 
     public WorldContactListener(){
@@ -42,13 +43,15 @@ public class WorldContactListener implements ContactListener {
 
         //gameObject + player érintkezik
         final Entity player;
-        final Entity gameObj;
+        final Entity enemy; //TODO ez enemyObject
         //a két ütköző test
         final Body bodyA = contact.getFixtureA().getBody();
         final Body bodyB = contact.getFixtureB().getBody();
         // kül kategóriák is vannak /Bit game Object- playerBit ezt kell ellenőrizni
         final int catFixA =  contact.getFixtureA().getFilterData().categoryBits;
         final int catFixB =  contact.getFixtureB().getFilterData().categoryBits;
+
+
         if ((int)(catFixA & BIT_PLAYER )== BIT_PLAYER){
             player = (Entity) bodyA.getUserData();
 
@@ -62,13 +65,13 @@ public class WorldContactListener implements ContactListener {
 
         }
 
-        if ((int)(catFixA & BIT_GAME_OBJECT )== BIT_GAME_OBJECT){
-            gameObj = (Entity) bodyA.getUserData();
-        }else if ((int)(catFixB & BIT_GAME_OBJECT )== BIT_GAME_OBJECT) {
-            gameObj = (Entity) bodyB.getUserData();
+        if ((int)(catFixA & BIT_ENEMY )== BIT_ENEMY){
+            enemy = (Entity) bodyA.getUserData();
+        }else if ((int)(catFixB & BIT_ENEMY )== BIT_ENEMY) {
+            enemy = (Entity) bodyB.getUserData();
         }else  {
 
-            //nincs player Contact
+            //nincs enemy entity  Contactban
             return;
         }
 
@@ -76,7 +79,7 @@ public class WorldContactListener implements ContactListener {
 
         for (final PlayerCollisionListener listener:listeners){
 
-            listener.playerCollision(player,gameObj);
+            listener.playerCollision(player,enemy);
         }
 
     }
@@ -86,12 +89,12 @@ public class WorldContactListener implements ContactListener {
 
 
         //we dont  neeed a special logic here
-     //   final Fixture fixtureA = contact.getFixtureA();
-     //   final Fixture fixtureB = contact.getFixtureB();
+     // final Fixture fixtureA = contact.getFixtureA();
+     //  final Fixture fixtureB = contact.getFixtureB();
 
 
-       // Gdx.app.debug("CONTACT", "END:"+fixtureA.getBody().getUserData() + "" +fixtureA.isSensor());
-       // Gdx.app.debug("CONTACT", "END:"+fixtureB.getBody().getUserData() + "" +fixtureB.isSensor());
+     //   Gdx.app.debug("CONTACT", "END:"+fixtureA.getBody().getUserData() + "" +fixtureA.isSensor());
+     //   Gdx.app.debug("CONTACT", "END:"+fixtureB.getBody().getUserData() + "" +fixtureB.isSensor());
 
 
 

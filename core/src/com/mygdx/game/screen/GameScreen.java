@@ -100,7 +100,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
                 // context.getRenderingInfo().setPosition(10,context.getScreenViewport().getScreenHeight()-context.renderingInfo.getHeight());
 
         enemySpawner++;
-        if (context.gameStarter & enemyCounter <80) {
+        if (context.gameStarter & enemyCounter <30) {
             //50 enemy hozza a 60at
             //70nél ius  hozz a 60at
             //80 már ingadozik 52-60 között

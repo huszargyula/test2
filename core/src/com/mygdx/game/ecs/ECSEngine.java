@@ -4,12 +4,14 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -28,6 +30,7 @@ import com.mygdx.game.ecs.component.PlayerComponent;
 import com.mygdx.game.ecs.component.PlayerIconComponent;
 import com.mygdx.game.map.GameObject;
 import com.mygdx.game.system.AnimationSystem;
+import com.mygdx.game.system.RemoveEntitySystem;
 import com.mygdx.game.system.SelectPlayerIconOrPlayerBodySystem;
 import com.mygdx.game.system.SelectedButtonAnimationSystem;
 import com.mygdx.game.system.EnemyAnimationSystem;
@@ -39,6 +42,7 @@ import com.mygdx.game.system.PlayerMovmentSystem;
 import box2dLight.RayHandler;
 
 import static com.mygdx.game.MyTowerDefenseGame.BIT_BUTTON;
+import static com.mygdx.game.MyTowerDefenseGame.BIT_ENEMY;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_GAME_OBJECT;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_GROUND;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_PLAYER;
@@ -59,7 +63,7 @@ public class ECSEngine extends PooledEngine {
 
 
 
-    public ImmutableArray<Entity> entites;
+    //public ImmutableArray<Entity> entites;
     private int playerCounter;
 
 
@@ -88,7 +92,7 @@ public class ECSEngine extends PooledEngine {
       // this.addSystem(new PlayerCameraSystem(context));
         this.addSystem(new AnimationSystem(context));
        this.addSystem(new PlayerAnimationSystem(context));
-       this.addSystem(new PlayerCollisionSystem(context));
+
         //lighting
      // this.addSystem(new LightSystem());
       this.addSystem(new EnemyMovmentSystem(context));
@@ -98,6 +102,13 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new SelectedButtonAnimationSystem(context));
 
         this.addSystem(new SelectPlayerIconOrPlayerBodySystem(context));
+        this.addSystem(new PlayerCollisionSystem(context));
+
+        //TODO kell egy Destroy ENTITI SYSTEM ami UTOLJÁRA FUT le!
+        //igy utoljára törli a entititket.
+        //jelenleg ez ez
+
+        this.addSystem(new RemoveEntitySystem(context));
 
         localPosition = new Vector2();
         posBeforeRotation = new Vector2();
@@ -125,7 +136,7 @@ public class ECSEngine extends PooledEngine {
         //box2d Component
 
         final B2DComponent b2DComponent = this.createComponent(B2DComponent.class);
-        enemy.add(setB2DcomponantBox(b2DComponent,playerSpawnLocation.x,playerSpawnLocation.y,width,height,enemy,BIT_PLAYER, (short)(BIT_GROUND | BIT_GAME_OBJECT)));
+        enemy.add(setB2DcomponantBox(b2DComponent,playerSpawnLocation.x,playerSpawnLocation.y,width,height,enemy,BIT_ENEMY, (short)(BIT_GROUND | BIT_GAME_OBJECT|BIT_PLAYER),true));
 
         // animation component
         final AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
@@ -137,11 +148,12 @@ public class ECSEngine extends PooledEngine {
         final HealthBarComponent healthBarComponent = this.createComponent(HealthBarComponent.class);
 
 
-        healthBarComponent.healtBar=  new ProgressBar(0,1,0.01f ,false, context.getSkin() ,"default");
+        healthBarComponent.healtBar=  new ProgressBar(0,1,0.01f ,false, context.getSkin() ,"hp");
       //TODO ezt beállítni widht height
-        healthBarComponent.healtBar.setSize(10,5);
+        healthBarComponent.healtBar.setSize(30,5);
 
         context.getStage().addActor(healthBarComponent.healtBar);
+        healthBarComponent.healthBarPercentege =1;
         enemy.add(healthBarComponent);
 
 
@@ -156,7 +168,7 @@ public class ECSEngine extends PooledEngine {
         final Entity button = this.createEntity();
 
         final B2DComponent b2DComponent = this.createComponent(B2DComponent.class);
-        button.add(setB2DcomponantBox(b2DComponent,gameButtonSpawnLocation.x,gameButtonSpawnLocation.y,width,height,button,BIT_BUTTON, BIT_GROUND ));
+        button.add(setB2DcomponantBox(b2DComponent,gameButtonSpawnLocation.x,gameButtonSpawnLocation.y,width,height,button,BIT_BUTTON, BIT_GROUND,true ));
 
         // animation component
         final AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
@@ -173,8 +185,29 @@ public class ECSEngine extends PooledEngine {
         final GameButtonComponent buttonComponent = this.createComponent(GameButtonComponent.class);
         button.add(buttonComponent);
 
-        this.addEntity(button);
 
+
+        final HealthBarComponent healthBarComponent = this.createComponent(HealthBarComponent.class);
+
+
+        healthBarComponent.healtBar=  new ProgressBar(0,1,0.01f ,false, context.getSkin() ,"hp");
+        //TODO ezt beállítni widht height
+        //TODO EnemyMovingSystemben is hard Coded
+        healthBarComponent.healtBar.setSize(80,5);
+
+        context.getStage().addActor(healthBarComponent.healtBar);
+        healthBarComponent.healthBarPercentege =1;
+
+        Vector3 vector = new Vector3(b2DComponent.body.getPosition().x,   b2DComponent.body.getPosition().y+height/2,1);
+        Vector3 vectorUp = context.getScreenViewport().getCamera().project(vector,0,0, Gdx.graphics.getWidth()-1,(Gdx.graphics.getHeight()-1));
+
+        //Vector3 vectorUp = context.getScreenViewport().project(vector);
+        //HEALTBAR vele együtt mozog
+
+        healthBarComponent.healtBar.setPosition(vectorUp.x,vectorUp.y,0);
+        button.add(healthBarComponent);
+
+        this.addEntity(button);
 
     }
 
@@ -192,7 +225,7 @@ public class ECSEngine extends PooledEngine {
         //box2d Component
         playerComponent.playerId = playerCounter;
         final B2DComponent b2DComponent = this.createComponent(B2DComponent.class);
-        player.add(setB2DcomponantBox(b2DComponent,playerSpawnLocation.x,playerSpawnLocation.y,width,height,player,BIT_PLAYER, (short)(BIT_GROUND | BIT_GAME_OBJECT)));
+        player.add(setB2DcomponantBox(b2DComponent,playerSpawnLocation.x,playerSpawnLocation.y,width,height,player,BIT_PLAYER, (short)(BIT_GROUND | BIT_GAME_OBJECT|BIT_ENEMY),false));
 
             // animation component
         final AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
@@ -280,7 +313,7 @@ public class ECSEngine extends PooledEngine {
     }
 
 
-    public B2DComponent setB2DcomponantBox(B2DComponent b2DComponent,float spawnLoacationX, float spawnLocationY, float width, float height,Entity userData ,short categoryBits, short maskBits ){
+    public B2DComponent setB2DcomponantBox(B2DComponent b2DComponent,float spawnLoacationX, float spawnLocationY, float width, float height,Entity userData ,short categoryBits, short maskBits, boolean isSensor ){
         MyTowerDefenseGame.resetBodieAndFixtureDefinition();
 
 
@@ -291,15 +324,18 @@ public class ECSEngine extends PooledEngine {
         MyTowerDefenseGame.BODY_DEF.position.set(spawnLoacationX,spawnLocationY +height*0.5f);// 0.5  a magassága
         MyTowerDefenseGame.BODY_DEF.fixedRotation = true;
         MyTowerDefenseGame.BODY_DEF.type= BodyDef.BodyType.DynamicBody;
+
         b2DComponent.body= world.createBody(MyTowerDefenseGame.BODY_DEF);
         b2DComponent.body.setUserData(userData);
         b2DComponent.width = width;
         b2DComponent.height =height;
+
         //anim
         b2DComponent.renderPosition.set(b2DComponent.body.getPosition());
 
         MyTowerDefenseGame.FIXTURE_DEF.filter.categoryBits = categoryBits;
         MyTowerDefenseGame.FIXTURE_DEF.filter.maskBits = maskBits ;
+        MyTowerDefenseGame.FIXTURE_DEF.isSensor=isSensor;
         //final PolygonShape
 
         final PolygonShape pShape =  new PolygonShape();

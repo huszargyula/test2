@@ -30,6 +30,7 @@ import com.mygdx.game.ecs.component.AnimationComponent;
 import com.mygdx.game.ecs.component.B2DComponent;
 import com.mygdx.game.ecs.component.GameObjectComponent;
 import com.mygdx.game.ecs.component.HealthBarComponent;
+import com.mygdx.game.ecs.component.RemoveComponent;
 import com.mygdx.game.map.MapLoader;
 import com.mygdx.game.map.MapListener;
 
@@ -57,6 +58,7 @@ public class GameRenderer implements Disposable, MapListener {
     private  ImmutableArray<Entity> animatedEntities;
     private  ImmutableArray<Entity> gameObjectEntities;
     private ImmutableArray<Entity> healtBarEntities;
+    private ImmutableArray<Entity> removeEntities;
 
 
     private final Array<TiledMapTileLayer> tiledMapLayers;
@@ -123,13 +125,16 @@ public class GameRenderer implements Disposable, MapListener {
         animatedEntities = context.getEcsEngine().getEntitiesFor(Family.all(AnimationComponent.class, B2DComponent.class).exclude(GameObjectComponent.class).get());
         healtBarEntities= context.getEcsEngine().getEntitiesFor(Family.all(HealthBarComponent.class).get());
                 //TODO kirajzol.
-
+        removeEntities = context.getEcsEngine().getEntitiesFor(Family.all(RemoveComponent.class).get());
 
     }
 
     public void render(final float alpha){
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        //Aktuélis Entiti szám.
+        //  Gdx.app.debug("GameRender", "Enities number: "+   context.getEcsEngine().getEntities().size());
+
 
 
 
@@ -220,6 +225,15 @@ public class GameRenderer implements Disposable, MapListener {
 
         }
 
+
+        for (final Entity entity:removeEntities){
+
+
+     //       context.getEcsEngine().removeEntity(entity);
+
+        }
+
+
     }
 
     private void setProgressHealtBar(Entity entity){
@@ -227,6 +241,11 @@ public class GameRenderer implements Disposable, MapListener {
         final HealthBarComponent healthBarComponent =ECSEngine.healthBarCmpMapper.get(entity);
 
         healthBarComponent.healtBar.setValue(healthBarComponent.healthBarPercentege);
+                if (healthBarComponent.healthBarPercentege ==1)
+                    {healthBarComponent.healtBar.setVisible(false);}
+                    else{healthBarComponent.healtBar.setVisible(true);}
+
+
 
 
 
