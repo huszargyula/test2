@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -10,19 +12,16 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2D;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -39,6 +38,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.game.UI.GameRenderer;
 import com.mygdx.game.audio.AudioManager;
 import com.mygdx.game.ecs.ECSEngine;
+import com.mygdx.game.ecs.component.B2DComponent;
 import com.mygdx.game.input.InputManager;
 import com.mygdx.game.map.MapManager;
 import com.mygdx.game.screen.AbstractScreen;
@@ -79,7 +79,7 @@ public class MyTowerDefenseGame extends Game {
 		//ne legyen statikus
 		private AssetManager assetManager;
 		private OrthographicCamera gameCamera;
-		public static final float UNIT_SCALE = 1/32f; //az egsség
+		public static final float UNIT_SCALE = 1/32f; //az egység
 		private SpriteBatch spriteBatch; //ez a texutárák rendeleléséhez kell
 
 		public boolean mapShown;
@@ -116,6 +116,7 @@ public class MyTowerDefenseGame extends Game {
 	public TextButton renderingInfo;
 	private StringBuilder stringBuilder;
 	private  TmxMapLoader tmxMapLoader;
+	private ImmutableArray<Entity> b2dEntities;
 
 
 	//TODO get Set
@@ -193,6 +194,9 @@ public class MyTowerDefenseGame extends Game {
 
 
 		ecsEngine = new ECSEngine(this);
+
+
+		b2dEntities = this.getEcsEngine().getEntitiesFor(Family.all(B2DComponent.class).get());
 
 		mapManager.setEcsEngine(getEcsEngine());
 
@@ -284,7 +288,7 @@ public class MyTowerDefenseGame extends Game {
 		}
 
 
-	public void heapAndFPSinfo(float FPS,float drawCalls, float textBind, float javaheap, float nativeheap) {
+	public void heapAndFPSinfo(float FPS,float drawCalls, float textBind, float javaheap, float nativeheap, int entiteSize) {
 
 
 		//txtButtob ddinamikus updetealése
@@ -311,6 +315,13 @@ public class MyTowerDefenseGame extends Game {
 		stringBuilder.append(" ");
 		stringBuilder.append(nativeheap);
 		stringBuilder.append(" Kby ");
+
+		stringBuilder.append("Ent  ");
+		stringBuilder.append("  ");
+		stringBuilder.append(entiteSize);
+		stringBuilder.append(" (db)");
+
+
 
 
 		//   stringBuilder.append("% }");
@@ -387,8 +398,25 @@ public class MyTowerDefenseGame extends Game {
 			//fizikia világ rendelrelése: a két iteráor most kb optimális, de lehet változtatni hogy pontosabb
 			// legyen, ennek utána lehet olvasni ha kell
 			//BOX2D debugrenderer a game rendererben !!!
+
+
+
 			while (accumulator >= FIXED_TIME_STEP) {
 				// TODO save the previos position of the body
+				for( Entity entity: b2dEntities){
+					final B2DComponent b2DComponent = ECSEngine.b2dCmpMapper.get(entity);
+                    b2DComponent.prevPosition = b2DComponent.body.getPosition();
+                    b2DComponent.prevAngle = b2DComponent.body.getAngle();
+
+				}
+
+
+				// itt a renderpozició és  getposition között lerpelünk egyet
+				// nekünk a prev x és a és a Bd között kell
+			//	b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
+
+
+				////
 				world.step(FIXED_TIME_STEP, 6, 2);
 				accumulator -= FIXED_TIME_STEP;
 

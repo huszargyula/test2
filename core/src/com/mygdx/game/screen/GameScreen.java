@@ -100,7 +100,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
                 // context.getRenderingInfo().setPosition(10,context.getScreenViewport().getScreenHeight()-context.renderingInfo.getHeight());
 
         enemySpawner++;
-        if (context.gameStarter & enemyCounter <30) {
+        if (context.gameStarter & enemyCounter <3) {
             //50 enemy hozza a 60at
             //70nél ius  hozz a 60at
             //80 már ingadozik 52-60 között
@@ -108,7 +108,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener
             //100enemy 30-35 40 fps
             //200enemy 11-7-8 fps
             if (enemySpawner > 100) {
-                context.getEcsEngine().createEnemy(context.getMapManager().getCurrentMap().getEnemyStartLocation(), 1, 1, context.getMapManager().getCurrentMap().getEnemyPath());
+                context.getEcsEngine().createEnemy(context.getMapManager().getCurrentMap().getEnemyStartLocation(), 1.2f, 1.2f,0.6f,0.6f, context.getMapManager().getCurrentMap().getEnemyPath());
                 enemyCounter++;
                 enemySpawner=0;
             }

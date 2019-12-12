@@ -218,7 +218,7 @@ public class GameRenderer implements Disposable, MapListener {
             */
 
         if (profiler.isEnabled()) {
-            context.heapAndFPSinfo(Gdx.graphics.getFramesPerSecond(), profiler.getDrawCalls(), profiler.getTextureBindings(), Gdx.app.getJavaHeap() / 1024, Gdx.app.getNativeHeap() / 1024);
+            context.heapAndFPSinfo(Gdx.graphics.getFramesPerSecond(), profiler.getDrawCalls(), profiler.getTextureBindings(), Gdx.app.getJavaHeap() / 1024, Gdx.app.getNativeHeap() / 1024, context.getEcsEngine().getEntities().size());
             profiler.reset();
             box2DDebugRenderer.render(world,gameCamera.combined);
 
@@ -263,8 +263,9 @@ public class GameRenderer implements Disposable, MapListener {
             final Sprite frame = animation.getKeyFrame(aniComponent.aniTime);
             //set bounds before origin and rotaion althought doc sasy its slightly les eff
             //But otherwise there is a strance flickering for the first fww sec
-            //
+            //TODO  ssss
             frame.setBounds(b2DComponent.renderPosition.x,b2DComponent.renderPosition.y,aniComponent.width,aniComponent.height);
+
             frame.setOriginCenter();
             frame.setRotation(b2DComponent.body.getAngle()* MathUtils.radDeg);
             frame.draw(spriteBatch);
@@ -285,6 +286,7 @@ public class GameRenderer implements Disposable, MapListener {
 
         final B2DComponent b2DComponent =ECSEngine.b2dCmpMapper.get(entity);
         final  AnimationComponent aniComponent = ECSEngine.aniCmpMapper.get(entity);
+
 //hova menjenű
 //gameCamera.unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).x;
         //gameCamera.unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).y;
@@ -292,14 +294,83 @@ public class GameRenderer implements Disposable, MapListener {
 
 
         if (aniComponent.aniType != null){
+          //  Gdx.app.debug("GameRendered",""+(int) aniComponent.width +"  "+(int) aniComponent.height+" "  );
 
-            final  Animation<Sprite> animation = getAnimation(aniComponent.aniType);
+            final  Animation<Sprite> animation = getAnimation(aniComponent.aniType,aniComponent.aniType.getAtlasSplitWidth(),aniComponent.aniType.getAtlasSplitHeight(), aniComponent.playMode);
+            final AnimationComponent animationComponent = ECSEngine.aniCmpMapper.get(entity);
+
+
             final Sprite frame = animation.getKeyFrame(aniComponent.aniTime);
+            //
 
-           b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
+            //TODO ezt hadtam hozzá
+            //TODO cmp mapper ?
+            //atadni egy az egyben az aniCMp nek ?
+            if (animationComponent.startAnimationCyle & !aniComponent.finishAnimationCycle ){
+                Gdx.app.debug("belépett"," endre vár");
 
-           frame.setBounds(b2DComponent.renderPosition.x- b2DComponent.width*0.5f,b2DComponent.renderPosition.y - b2DComponent.height*0.5f,aniComponent.width,aniComponent.height);
+                animationComponent.isSpecificFrameStarted= (animation.getKeyFrameIndex(aniComponent.aniTime)==animationComponent.specificAnimationFrame);
+
+                animationComponent.finishAnimationCycle =(animation.isAnimationFinished(aniComponent.aniTime));
+
+
+            }
+
+            //eredeti
+           // b2DComponent.renderPosition.lerp(b2DComponent.body.getPosition(),alpha);
+            //TODO ANGLE beállítás
+            // .setAngle = az alábbi valami ilyesmi how to lerp/ interpolate angle
+        //    b2DComponent.prevAngle.lerp(b2DComponent.prevAngle,alpha);
+
+    //        Gdx.app.debug("GameRendered render"," "+b2DComponent.renderPosition);
+      //      Gdx.app.debug("GameRendered prevp"," "+b2DComponent.prevPosition);
+       //     Gdx.app.debug("GameRendered getp"," "+b2DComponent.body.getPosition());
+        //    Gdx.app.debug("GameRendered b2dcomp"," "+b2DComponent);
+           b2DComponent.renderPosition = b2DComponent.prevPosition.lerp(b2DComponent.body.getPosition(), alpha);
+
+
+            //TODO ez a FONTOS ez entity testéenk és animációjának a mérete
+      //  frame.setBounds(b2DComponent.renderPosition.x - b2DComponent.width*0.5f,b2DComponent.renderPosition.y - b2DComponent.height*0.5f,aniComponent.width,aniComponent.height);
+                //közpre igazitás:
+            //  frame.setBounds(b2DComponent.renderPosition.x-aniComponent.aniType.getAtlasSplitWidth()*(UNIT_SCALE)*0.5f,b2DComponent.renderPosition.y-aniComponent.aniType.getAtlasSplitHeight()*(UNIT_SCALE)*0.5f,aniComponent.aniType.getAtlasSplitWidth()*UNIT_SCALE*aniComponent.width,aniComponent.aniType.getAtlasSplitHeight()*UNIT_SCALE*aniComponent.height);
+
+            // függőlegesen a body aljához, vizszíintesen középre igazít
+            //animwidth , animheight h a frame mekkoare legyen
+
+           // frame.setBounds(b2DComponent.renderPosition.x-aniComponent.aniType.getAtlasSplitWidth()*(UNIT_SCALE)*0.5f,b2DComponent.renderPosition.y-b2DComponent.height*0.5f,aniComponent.aniType.getAtlasSplitWidth()*UNIT_SCALE*aniComponent.width,aniComponent.aniType.getAtlasSplitHeight()*UNIT_SCALE*aniComponent.height);
+            frame.setBounds(b2DComponent.renderPosition.x-aniComponent.aniType.getAtlasSplitWidth()*aniComponent.width*(UNIT_SCALE)*0.5f,b2DComponent.renderPosition.y-b2DComponent.height*0.5f,aniComponent.aniType.getAtlasSplitWidth()*UNIT_SCALE*aniComponent.width,aniComponent.aniType.getAtlasSplitHeight()*UNIT_SCALE*aniComponent.height);
+
+
+            //TODO ez lehet hogy cpu ignyes művelet
+         if (aniComponent.isFaceingRight) {
+             if (frame.isFlipX()) {
+               //
+             }else{
+                 frame.flip(true, false);
+             }
+         }else{
+             if (frame.isFlipX()) {
+                 frame.flip(true, false);
+             }else{
+
+             }
+
+
+         }
+
+
+
+            //     Gdx.app.debug("GameRendered"," "+ b2DComponent.renderPosition.x );
+        //    Gdx.app.debug("GameRendered"," "+ b2DComponent.body);
+        //    Gdx.app.debug("GameRendered"," "+ aniComponent.width);
+        //    Gdx.app.debug("GameRendered"," "+aniComponent.height);
+
+
+
+            //  frame.setBounds(b2DComponent.renderPosition.x-aniComponent.width*0.5f,b2DComponent.renderPosition.y- b2DComponent.height*0.5f ,aniComponent.width,aniComponent.height);
            frame.draw(spriteBatch);
+
+
 
 
         }else{
@@ -319,25 +390,29 @@ public class GameRenderer implements Disposable, MapListener {
 
     }
 
-    private Animation<Sprite> getAnimation(AnimationType aniType) {
+    private Animation<Sprite> getAnimation(AnimationType aniType,int tileWidth, int tileHeight, Animation.PlayMode playmode) {
         Animation<Sprite> animation = animationCache.get(aniType);
         if (animation ==null){
-            Gdx.app.debug(TAG,"Creating new animation of type"+aniType);
-           TextureRegion[][] textureRegions = regionCache.get(aniType.getAtlasKey());
+           Gdx.app.debug(TAG,"Creating new animation of type "+aniType);
+          TextureRegion[][] textureRegions = regionCache.get(aniType.getAtlasKey());
            if (textureRegions ==null){
-               Gdx.app.debug(TAG,"Creating texture region for"+aniType.getAtlasKey());
+               Gdx.app.debug(TAG,"Creating texture region for "+aniType.getAtlasKey());
 
                //ez az egész négyzet!!
-               final TextureAtlas.AtlasRegion atlasRegion =assetManager.get(aniType.getAtlasPath(),TextureAtlas.class).findRegion(aniType.getAtlasKey());
+            final    TextureAtlas.AtlasRegion atlasRegion =assetManager.get(aniType.getAtlasPath(),TextureAtlas.class).findRegion(aniType.getAtlasKey());
                //daraboljuk:
-               textureRegions = atlasRegion.split(32,32);
+               Gdx.app.debug("Tile Information","TileWidth" + tileWidth + "TileHeight"+ tileHeight);
+               textureRegions = atlasRegion.split(tileWidth,tileHeight);
                regionCache.put(aniType.getAtlasKey(),textureRegions);
-
+            // atlasRegion=null;
 
            }
             //creat animation
             animation = new Animation<Sprite>(aniType.getFrameTime(),getKeyFrames(textureRegions[aniType.getRowIndex()]));
-            animation.setPlayMode(Animation.PlayMode.LOOP);
+         //   animation.setPlayMode(Animation.PlayMode.LOOP);
+            animation.setPlayMode(playmode);
+
+          //  entity, stb
             animationCache.put(aniType,animation);
         }
 
@@ -349,13 +424,13 @@ public class GameRenderer implements Disposable, MapListener {
     private Sprite [] getKeyFrames(TextureRegion[] textureRegion) {
       //TODO ezt átirni h ne kreáljon mindig uj spritot FONTOS
       //itt minidig uj spr
-        getKeyFremesSPriteReset();
+       // getKeyFremesSPriteReset();
       //  final  Sprite[] keyFrames = new Sprite[textureRegion.length];
        // keyframeSprite2DArray
         final  Sprite[] keyFrames = new Sprite[textureRegion.length];
              int i =0;
-            for (final TextureRegion region:textureRegion){
-               final Sprite sprite = new Sprite(region);
+            for ( TextureRegion region:textureRegion){
+                Sprite sprite = new Sprite(region);
               //  keyframeSprite.setRegion(region);
                // keyframeSprite.setColor(1, 1, 1, 1);
                // keyframeSprite.setSize(region.getRegionWidth(), region.getRegionHeight());

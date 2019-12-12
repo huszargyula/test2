@@ -29,7 +29,7 @@ public class PlayerMovmentSystem extends IteratingSystem implements GameKeyInput
     private int antiWiggleFactorY;
     public OrthographicCamera camer;
     public MyTowerDefenseGame context;
-
+    public Vector2 direction;
 
     public boolean isSelected;
   //  MyTowerDefenseGame context;
@@ -51,90 +51,18 @@ public class PlayerMovmentSystem extends IteratingSystem implements GameKeyInput
         xFactor=yFactor =0;
         antiWiggleFactorX = antiWiggleFactorY =1;
         this.context = context;
-
+        direction = new Vector2(0,0);
     }
 
     //ez elvileg minden entitásra meg lesz hívva ami a "familye" része
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        //el kell érnünk az összes komponensünk a meghíváshoz: Component mapper az enginben
-        //entity.getComponent(PlayerComponent.class); ez lenne alapból, de ez lassú megoldás!!
+
         playerIconEntites = context.getEcsEngine().getEntitiesFor(Family.all( PlayerIconComponent.class).get());
         final  PlayerComponent playerComponent=  ECSEngine.playerCmpMapper.get(entity); // ez ugyanaz mint a felette levő, csak component mapperrel, gyorsabb
         final  B2DComponent b2dComponent = ECSEngine.b2dCmpMapper.get(entity);
 
-
-
-
-        //PLAYER Mozgatása
-       // if (directionChange) {
-
-//////////////////////////////////////////////////////////////
-  /*
-        if (Gdx.input.justTouched() &isSelected == true ){
-
-             // b2dComp
-
-            isSelected = false;
-
-            int pointX = Gdx.input.getX();
-            int pointY = Gdx.input.getY();
-            Gdx.app.debug("PLAYERMOVMENTSYSTEM", "Screen Touched after selected " +Gdx.input.justTouched());
-            // b2dComp
-
-            Vector3 vector = new Vector3(pointX, pointY, 0);
-            Vector3 vectorUp = camer.unproject(vector);
-           // b2dComp
-
-            b2dComponent.setDirection.set(vectorUp);
-           // b2dComp
-
-        }
-
-        if (Gdx.input.justTouched()) {
-                int pointX = Gdx.input.getX();
-                int pointY = Gdx.input.getY();
-
-                Vector3 vector = new Vector3(pointX, pointY, 0);
-                Vector3 vectorUp = camer.unproject(vector);
-
-                boolean wasTouched = b2dComponent.body.getFixtureList().first().testPoint(vectorUp.x, vectorUp.y);
-
-                if (wasTouched) {
-                    Gdx.app.debug("PLAYERMOVMENTSYSTEM", "Body was touched ");
-                    // b2dComp
-                    wasTouched = false;
-                    //Handle touch
-                   isSelected = true;
-
-                }
-              }
-*/
-//////////////////////////////////////////////
-
-
-
-
-            /*
-            directionChange =false; //ne hívodjon minig meg
-            b2dComponent.body.applyLinearImpulse(
-                    (xFactor * playerComponent.speed.x - b2dComponent.body.getLinearVelocity().x )* b2dComponent.body.getMass(),
-                    (yFactor * playerComponent.speed.y - b2dComponent.body.getLinearVelocity().y )* b2dComponent.body.getMass(),
-                    b2dComponent.body.getWorldCenter().x, b2dComponent.body.getWorldCenter().y,
-                    true
-            );
-
-
- */
-
-// telefon origo az 0,0
-//origo world
-
-directionChange =false; //ne hívodjon minig meg
-
-
-
-
+    directionChange =false; //ne hívodjon minig meg
 
        // Gdx.app.debug("RenderInfo X", (float) b2dComponent.setDirection.x + " current:" + b2dComponent.body.getPosition().x);
       //  Gdx.app.debug(TAG, "Screen is touched " + Gdx.input.getX());
@@ -164,98 +92,27 @@ directionChange =false; //ne hívodjon minig meg
 
            xFactor=yFactor=0;
         }
-       // b2dComponent.body.setTransform(b2dComponent.setDirection.x,b2dComponent.setDirection.y-b2dComponent.height/2,0);
 
-       // Gdx.app.debug(TAG, "Screen is touched " + b2dComponent.setDirection.x +"Y: "+b2dComponent.setDirection.y);
-
-    /*    if (playerComponent.hasSelected){
-        b2dComponent.body.setTransform(b2dComponent.setDirection.x,b2dComponent.setDirection.y,0);
-
-       }
-     */
-
-        //   b2dComponent.body.setTransform(b2dComponent.setDirection.x,b2dComponent.setDirection.y,0);
-
-/*
-
-        if  ((Math.abs( b2dComponent.setDirection.x-b2dComponent.body.getPosition().x)<1.15) & (Math.abs( b2dComponent.setDirection.y-b2dComponent.body.getPosition().y)<1.15)) {
-        }else if ((Math.abs( b2dComponent.setDirection.x-b2dComponent.body.getPosition().x)<1.15)){
-
-            b2dComponent.body.applyLinearImpulse(
-
-                  0,//* b2dComponent.body.getMass(),
-                    ((yFactor * playerComponent.speed.y - b2dComponent.body.getLinearVelocity().y)),//* b2dComponent.body.getMass(),
-                    b2dComponent.body.getWorldCenter().x, b2dComponent.body.getWorldCenter().y,
-                    true
-
-
-            );
-
-
-        }else if  (Math.abs( b2dComponent.setDirection.y-b2dComponent.body.getPosition().y)<1.15){
-
-            b2dComponent.body.applyLinearImpulse(
-
-                    ((xFactor * playerComponent.speed.x - b2dComponent.body.getLinearVelocity().x)),//* b2dComponent.body.getMass(),
-                    0,//* b2dComponent.body.getMass(),
-                    b2dComponent.body.getWorldCenter().x, b2dComponent.body.getWorldCenter().y,
-                    true
-
-
-            );
-
-        }
-         else {
-        }
-
-       */
-
-              //      Gdx.app.debug(TAG, "Screen is touched "+ Math.abs( b2dComponent.setDirection.y-b2dComponent.body.getPosition().y));
-           // b2dComponent.body.
-
-        //hova menjenű
-/*
-        int pointX= Gdx.input.getX();
-            int pointY =   Gdx.input.getY();
-
-        Vector3 vector = new Vector3(pointX,pointY, 0);
-        Vector3 vectorUp = camer.unproject(vector);
-
-        boolean wasTouched = b2dComponent.body.getFixtureList().first().testPoint(vectorUp.x,vectorUp.y);
-
-        if (wasTouched) {
-            Gdx.app.debug(TAG, "Body was touched ");
-            // b2dComp
-
-            //Handle touch
-        }
-
- */
 
             //b2dComponent.body.applyAngularImpulse();
-        if (Math.abs(playerComponent.setDirection.x-b2dComponent.body.getPosition().x)<0.5f &  Math.abs(playerComponent.setDirection.y-b2dComponent.body.getPosition().y)<0.5f) {
+        //TODO NE HOZZ AMINDIG LÉTRE? TÖBBIT KITÖRÖLNI!
+        direction.set(playerComponent.setDirection.x, playerComponent.setDirection.y);
+        direction.sub(b2dComponent.body.getPosition());
+        direction.nor();
 
-            playerComponent.setDirection.x = 0;
-            playerComponent.setDirection.y = 0;
+
+
+        if (Math.abs(playerComponent.setDirection.x-b2dComponent.body.getPosition().x)<0.5f &  Math.abs(playerComponent.setDirection.y-b2dComponent.body.getPosition().y)<0.5f) {
+            b2dComponent.body.setLinearVelocity(0,0);
+            //nem mozog
+        }else{
+            b2dComponent.body.setLinearVelocity(direction.scl(playerComponent.speed));
+
+
         }
 
 
 
-
-            b2dComponent.body.applyLinearImpulse(
-
-                    ((xFactor * playerComponent.speed.x - b2dComponent.body.getLinearVelocity().x)),//* b2dComponent.body.getMass(),
-                    ((yFactor * playerComponent.speed.y - b2dComponent.body.getLinearVelocity().y)),//* b2dComponent.body.getMass(),
-                    b2dComponent.body.getWorldCenter().x, b2dComponent.body.getWorldCenter().y,
-                    true
-
-
-            );
-
-
-
-   //     }
-       // }
 
     }
 
@@ -290,9 +147,6 @@ directionChange =false; //ne hívodjon minig meg
 
             default:
                 return;
-
-
-
 
         }
 

@@ -101,6 +101,13 @@ public class LoadingGameScreen extends AbstractScreen<LoadingGameUI>
         assetManager.load("charracters_effects/effect.atlas", TextureAtlas.class );
         assetManager.load("anim/bird_anim2.atlas", TextureAtlas.class );
         assetManager.load("anim/button.atlas",TextureAtlas.class);
+        assetManager.load("anim/hero_all_animation.atlas", TextureAtlas.class );
+        assetManager.load("anim/proba.atlas", TextureAtlas.class );
+        assetManager.load("anim/mano_mage.atlas", TextureAtlas.class );
+
+
+
+
 
         //1 darab map betöltése
         // assetManager.load("map/map.tmx", TiledMap.class);
@@ -147,12 +154,16 @@ public class LoadingGameScreen extends AbstractScreen<LoadingGameUI>
         //0áznmi
         //TODO fonots, amit elöbb rajzol, az lesz  hátul a rétegekben
 
+        context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation(),2,2,1.5f,1.5f,2);
 
-        context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation(),2,2);
-        context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(5,5),2,2);
+        // context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation(),2,2,128,128,1);
+     //   context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(5,5),2,2,2,2,1);
         Gdx.app.debug("PStartLoc",""+context.getMapManager().getCurrentMap().getStartLocation());
-        context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(6,1),2,2);
-       context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(8,1),2,2);
+       // context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(-5,-5),1,1,2,2,3);
+
+
+        //  context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(6,1),2,2,128,128,3);
+      // context.getEcsEngine().createPlayer(context.getMapManager().getCurrentMap().getStartLocation().add(8,1),2,2,128,128,4);
 
         //TODO hard Coded
 

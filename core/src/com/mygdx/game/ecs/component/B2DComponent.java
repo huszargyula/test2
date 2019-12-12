@@ -21,6 +21,11 @@ public class B2DComponent implements Component, Pool.Poolable {
     public float lightFluctuacionSpeed;
     public boolean directionsSetted;
 
+    public Vector2 prevPosition =new Vector2();
+ //   public Vector2 position;
+    public float angle;
+    public float prevAngle;
+
     // hová kattintott a játékos
 //    public Vector3 setDirection= new Vector3();
 
@@ -38,6 +43,11 @@ public class B2DComponent implements Component, Pool.Poolable {
         lightFluctuacionSpeed=0;
         directionsSetted = false;
 
+        angle =0;
+        prevAngle=0;
+        prevPosition.set(0,0);
+        renderPosition.set(0,0);
+       // position.set(0,0);
 
         if (light!=null){
             light.remove(true);
@@ -51,7 +61,7 @@ public class B2DComponent implements Component, Pool.Poolable {
 
         }
         width =height =0;
-        renderPosition.set(0,0);
+
 
     }
 }

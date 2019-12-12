@@ -8,7 +8,9 @@ import com.badlogic.gdx.utils.Pool;
 public class PlayerComponent implements Component, Pool.Poolable {
 
     public boolean hasAxe;
-    public Vector2 speed = new Vector2();
+
+   // public Vector2 speed = new Vector2();
+    public float speed;
     public boolean hasSelected;
     public int playerId;
     public Vector3 setDirection= new Vector3();
@@ -19,10 +21,10 @@ public class PlayerComponent implements Component, Pool.Poolable {
 
         hasSelected = false;
         hasAxe = false;
-        speed.set(0,0);
+     //   speed.set(0,0);
         playerId = 0;
         setDirection.set(0,0,0);
-
+        speed = 0;
     }
 
 

@@ -31,30 +31,59 @@ public class PlayerAnimationSystem extends IteratingSystem {
 
 
 
-        if (b2DComponent.body.getLinearVelocity().equals(Vector2.Zero)){
-          /* //player does not move azaz ha nem akarjuk mozgatni
-            //ha nem mozogna mondjuk lehet lenne optimálisabb
-            animationComponent.aniTime=0;
-            */
+        if (b2DComponent.body.getLinearVelocity().equals(Vector2.Zero)==false ) {
+        resetAnimationComponentSettings(animationComponent);
+
+        }
+
+            if (b2DComponent.body.getLinearVelocity().equals(Vector2.Zero) ){
+        //    Gdx.app.debug("Most áll","NAVEGRE");
 
         }else if(b2DComponent.body.getLinearVelocity().x>0){
-
+         //   resetAnimationComponentSettings(animationComponent);
             animationComponent.aniType = AnimationType.HERO_MOVE_RIGHT;
+          //  Gdx.app.debug("Most 1","dd");
+
 
         }else  if(b2DComponent.body.getLinearVelocity().x<0){
+           // resetAnimationComponentSettings(animationComponent);
 
             animationComponent.aniType = AnimationType.HERO_MOVE_LEFT;
+            //Gdx.app.debug("Most 2","dd");
+
 
         }else if(b2DComponent.body.getLinearVelocity().y>0){
 
+           // resetAnimationComponentSettings(animationComponent);
             //animationComponent.aniType = AnimationType.HERO_MOVE_UP;
             animationComponent.aniType = AnimationType.HERO_MOVE_RIGHT;
+            //Gdx.app.debug("Most 3","ddddd");
 
         }else if(b2DComponent.body.getLinearVelocity().y<0){
-
+         //   resetAnimationComponentSettings(animationComponent);
             //animationComponent.aniType = AnimationType.HERO_MOVE_DOWN;
+            //Gdx.app.debug("Most 4","d");
+
             animationComponent.aniType = AnimationType.HERO_MOVE_LEFT;
+        }else{
+
+            //Gdx.app.debug("Most áll","dddd");
+
+
         }
 
+
+
+
     }
+
+    public void resetAnimationComponentSettings(AnimationComponent animationComponent){
+
+        animationComponent.isSpecificFrameStarted = false;
+        animationComponent.isSpecificFrameFinished = false;
+        animationComponent.startAnimationCyle = false;
+        animationComponent.finishAnimationCycle= false;
+
+    }
+
 }

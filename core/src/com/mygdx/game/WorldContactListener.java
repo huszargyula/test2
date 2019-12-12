@@ -16,17 +16,26 @@ import static com.mygdx.game.MyTowerDefenseGame.BIT_GAME_OBJECT;
 import static com.mygdx.game.MyTowerDefenseGame.BIT_PLAYER;
 
 public class    WorldContactListener implements ContactListener {
-    private final Array<PlayerCollisionListener> listeners;
+    private final Array<PlayerAndEnemyBeginCollisionListener> beginListeners;
+    private final Array<PlayerAndEnemyEndCollisionListener> endListeners;
+
+
 
     public WorldContactListener(){
-        listeners = new Array<PlayerCollisionListener>();
+        beginListeners = new Array<PlayerAndEnemyBeginCollisionListener>();
+        endListeners = new Array<PlayerAndEnemyEndCollisionListener>();
+    }
+
+    public  void addPlayerAndEnemyBeginCollisionListener (final PlayerAndEnemyBeginCollisionListener listener){
+        beginListeners.add(listener);
 
     }
 
-    public  void addPlayerCollisionListener (final PlayerCollisionListener listener){
-        listeners.add(listener);
+    public  void addPlayerAndEnemyEndCollosionListener (final PlayerAndEnemyEndCollisionListener listener){
+        endListeners.add(listener);
 
     }
+
 
     //ütközés történik kezdődik, befejeződik
     @Override
@@ -77,15 +86,62 @@ public class    WorldContactListener implements ContactListener {
 
         //Gdx.app.debug("COLLDEBUG", "player collides with gameObj");
 
-        for (final PlayerCollisionListener listener:listeners){
+        for (final PlayerAndEnemyBeginCollisionListener listener:beginListeners){
 
-            listener.playerCollision(player,enemy);
+            listener.playerEnemyBeginCollision(player,enemy);
         }
 
     }
 
     @Override
     public void endContact(Contact contact) {
+
+        final Entity player;
+        final Entity enemy; //TODO ez enemyObject
+        //a két ütköző test
+        final Body bodyA = contact.getFixtureA().getBody();
+        final Body bodyB = contact.getFixtureB().getBody();
+        // kül kategóriák is vannak /Bit game Object- playerBit ezt kell ellenőrizni
+        final int catFixA =  contact.getFixtureA().getFilterData().categoryBits;
+        final int catFixB =  contact.getFixtureB().getFilterData().categoryBits;
+
+
+        if ((int)(catFixA & BIT_PLAYER )== BIT_PLAYER){
+            player = (Entity) bodyA.getUserData();
+
+        }else if ((int)(catFixB & BIT_PLAYER )== BIT_PLAYER) {
+            player = (Entity) bodyB.getUserData();
+
+        }else  {
+
+            //nincs player Contact
+            return;
+
+        }
+
+        if ((int)(catFixA & BIT_ENEMY )== BIT_ENEMY){
+            enemy = (Entity) bodyA.getUserData();
+        }else if ((int)(catFixB & BIT_ENEMY )== BIT_ENEMY) {
+            enemy = (Entity) bodyB.getUserData();
+        }else  {
+
+            //nincs enemy entity  Contactban
+            return;
+        }
+        //ha meghal akkor is műxik
+
+
+        for (final PlayerAndEnemyEndCollisionListener listener:endListeners){
+
+            listener.playerEnemyEndCollision(player,enemy);
+        }
+
+        /*
+        for (final PlayerCollisionListener listener:listeners){
+
+            listener.playerCollision(player,enemy);
+        }
+*/
 
 
         //we dont  neeed a special logic here
@@ -121,10 +177,16 @@ public class    WorldContactListener implements ContactListener {
 
 
     }
-    public interface PlayerCollisionListener{
-        void playerCollision(final Entity player,final Entity gamObject);
+    public interface PlayerAndEnemyBeginCollisionListener{
+        void playerEnemyBeginCollision(final Entity player,final Entity gamObject);
 
     }
+
+    public interface PlayerAndEnemyEndCollisionListener{
+        void playerEnemyEndCollision(final Entity player,final Entity gamObject);
+
+    }
+
 
 
 }
