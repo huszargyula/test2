@@ -103,7 +103,7 @@ public class LoadingGameScreen extends AbstractScreen<LoadingGameUI>
         assetManager.load("anim/button.atlas",TextureAtlas.class);
         assetManager.load("anim/hero_all_animation.atlas", TextureAtlas.class );
         assetManager.load("anim/proba.atlas", TextureAtlas.class );
-        assetManager.load("anim/mano_mage.atlas", TextureAtlas.class );
+        assetManager.load("anim/mano_all.atlas", TextureAtlas.class );
 
 
 

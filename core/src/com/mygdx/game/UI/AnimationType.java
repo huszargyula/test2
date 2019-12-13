@@ -17,13 +17,22 @@ public enum AnimationType {
     HERO_FIGHT_RIGHT("anim/hero_all_animation.atlas","hero_anim_fight", 0.5f , 0,110,70),
     HERO_FIGHT_LEFT("anim/hero_all_animation.atlas","hero_anim_fight", 0.5f , 1,110,70),
 
-    MANO_MAGE_BASIC_DEATH_LEFT("anim/mano_mage.atlas","mano_mage_death", 0.15f , 0,150,125),
+    MANO_MAGE_BASIC_DEATH_LEFT("anim/mano_all.atlas","mano_mage_death", 0.15f , 0,150,125),
 
-    MANO_MAGE_BASIC_FIGHT_LEFT("anim/mano_mage.atlas","mano_mage_fight", 0.4f , 0,98,113),
+    MANO_MAGE_BASIC_FIGHT_LEFT("anim/mano_all.atlas","mano_mage_fight", 0.4f , 0,98,113),
 
-    MANO_MAGE_BASIC_MOVE_LEFT("anim/mano_mage.atlas","mano_mage_moving", 0.15f , 0,93,105),
+    MANO_MAGE_BASIC_MOVE_LEFT("anim/mano_all.atlas","mano_mage_moving", 0.15f , 0,93,105),
 
-    MANO_MAGE_BASIC_WAIT_LEFT("anim/mano_mage.atlas","mano_mage_wait", 0.15f , 0,75,108),
+    MANO_MAGE_BASIC_WAIT_LEFT("anim/mano_all.atlas","mano_mage_wait", 0.15f , 0,75,108),
+
+    MANO_FIGHTER_BASIC_DEATH_LEFT("anim/mano_all.atlas","mano_mage_death", 0.15f , 0,175,125),
+
+    MANO_FIGHTER_BASIC_FIGHT_LEFT("anim/mano_all.atlas","mano_mage_fight", 0.4f , 0,130,120),
+
+    MANO_FIGHTER_BASIC_MOVE_LEFT("anim/mano_all.atlas","mano_mage_moving", 0.15f , 0,125,120),
+
+    MANO_FIGHTER_BASIC_WAIT_LEFT("anim/mano_all.atlas","mano_mage_wait", 0.15f , 0,125,120),
+
 
 
     BIRD_MOVE_LEFT("anim/bird_anim2.atlas","bird_anim_all", 0.05f , 1,32,32),
